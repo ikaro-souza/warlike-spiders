@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import React from "react";
 import { TopAppBar } from "y/components/top-app-bar";
+import { api } from "y/utils/api";
 
 const DynamicBottomSheet = dynamic(
   () => import("y/components/bottom-sheet").then((mod) => mod.BottomSheet),
@@ -26,27 +27,7 @@ const Page: NextPage = () => {
           />
           <p>Sammy Scooter</p>
         </header>
-        <section
-          aria-label="Shift summary"
-          className="grid w-full grid-cols-2 grid-rows-2"
-        >
-          <SummaryItem
-            label={"Estimated tips"}
-            value={Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-            }).format(108)}
-          />
-          <SummaryItem
-            label={"Total sold"}
-            value={Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-            }).format(1080)}
-          />
-          <SummaryItem label={"Tables closed"} value={12} />
-          <SummaryItem label={"Serving Tables"} value={"5".padStart(2, "0")} />
-        </section>
+        <Summary />
         <DynamicBottomSheet />
       </main>
     </>
@@ -56,6 +37,39 @@ const Page: NextPage = () => {
 export default Page;
 
 const PROFILE_IMAGE_SIZE = 120;
+
+const Summary = () => {
+  const { data, isLoading } = api.table.getWaiterShiftSummary.useQuery();
+
+  return !data ? (
+    <p>loading...</p>
+  ) : (
+    <section
+      aria-label="Shift summary"
+      className="grid w-full grid-cols-2 grid-rows-2"
+    >
+      <SummaryItem
+        label={"Estimated tips"}
+        value={Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(data.estimatedTips)}
+      />
+      <SummaryItem
+        label={"Total sold"}
+        value={Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(data.totalSold)}
+      />
+      <SummaryItem label={"Tables closed"} value={data.tablesClosed} />
+      <SummaryItem
+        label={"Serving Tables"}
+        value={data.servingTables.toString().padStart(2, "0")}
+      />
+    </section>
+  );
+};
 
 type SummaryItemProps = {
   label: string;
