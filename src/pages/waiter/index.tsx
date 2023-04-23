@@ -1,7 +1,15 @@
 import type { NextPage } from "next";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import React from "react";
 import { TopAppBar } from "y/components/top-app-bar";
+
+const DynamicBottomSheet = dynamic(
+  () => import("y/components/bottom-sheet").then((mod) => mod.BottomSheet),
+  {
+    loading: () => <p>Loading...</p>,
+  }
+);
 
 const Page: NextPage = () => {
   return (
@@ -39,6 +47,7 @@ const Page: NextPage = () => {
           <SummaryItem label={"Tables closed"} value={12} />
           <SummaryItem label={"Serving Tables"} value={"5".padStart(2, "0")} />
         </section>
+        <DynamicBottomSheet />
       </main>
     </>
   );
