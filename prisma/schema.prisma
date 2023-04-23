@@ -45,9 +45,17 @@ model User {
     email         String?      @unique
     emailVerified DateTime?
     image         String?
+    role          UserRole     @default(none)
     accounts      Account[]
     sessions      Session[]
-    Restaurant    Restaurant[]
+    restaurant    Restaurant[]
+    deletedAt     DateTime?
+}
+
+enum UserRole {
+    none
+    client
+    waiter
 }
 
 model VerificationToken {
@@ -63,8 +71,31 @@ model Restaurant {
     name      String   @db.VarChar(30)
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now())
-    ownerId   String?
-    owner     User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+    ownerId   String
+    owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
     @@index([ownerId])
+}
+
+model TableSession {
+    id        String             @id @default(cuid())
+    createdAt DateTime           @default(now())
+    updatedAt DateTime           @default(now())
+    closedAt  DateTime?
+    status    TableSessionStatus @default(active)
+    waiterId  String
+
+    @@index([waiterId])
+}
+
+enum TableSessionStatus {
+    active
+    requesting_waiter
+    ordering
+    waiting_order
+    closed
+}
+
+model Order {
+    id String @id @default(cuid())
 }
