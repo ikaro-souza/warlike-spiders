@@ -20,6 +20,9 @@ export const waiterShiftSummaryTableSchema = z.object({
   status: tableStatus,
   lastOrder: z.date(),
 });
+export type WaiterShiftSummaryTable = z.infer<
+  typeof waiterShiftSummaryTableSchema
+>;
 
 export const waiterShiftSummarySchema = z.object({
   totalSold: z.number(),
