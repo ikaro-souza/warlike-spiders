@@ -1,14 +1,16 @@
 import { DateTime } from "luxon";
 import type { NextPage } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { Section, SectionBody, SectionHeader } from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
 import { type TableStatus, type WaiterShiftSummary } from "y/server/schemas";
 import { api } from "y/utils/api";
+import { currencyFormatter } from "y/utils/locale";
 
 const Page: NextPage = () => {
-    const { data, isLoading } = api.table.getWaiterShiftSummary.useQuery();
+    const { data } = api.table.getWaiterShiftSummary.useQuery();
 
     return (
         <>
@@ -70,19 +72,13 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
         >
             <SummaryItem
                 label={"Estimated tips"}
-                value={Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                }).format(data.estimatedTips)}
+                value={currencyFormatter.format(data.estimatedTips)}
             />
             <SummaryItem
                 label={"Total sold"}
-                value={Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                }).format(data.totalSold)}
+                value={currencyFormatter.format(data.totalSold)}
             />
-            <SummaryItem label={"Tables closed"} value={data.tablesClosed} />
+            <SummaryItem label={"Tables closed"} value={data.totalOrdered} />
             <SummaryItem
                 label={"Serving Tables"}
                 value={data.servingTables.length.toString().padStart(2, "0")}
@@ -105,11 +101,17 @@ const SummaryItem: React.FC<SummaryItemProps> = ({ label, value }) => {
 };
 
 type TableItemProps = {
+    id: string;
+    lastOrder: Date;
     number: number;
     status: TableStatus;
-    lastOrder: Date;
 };
-const TableItem: React.FC<TableItemProps> = ({ lastOrder, number, status }) => {
+const TableItem: React.FC<TableItemProps> = ({
+    id,
+    lastOrder,
+    number,
+    status,
+}) => {
     const statusText = React.useMemo(() => {
         switch (status) {
             case "requesting_waiter":
@@ -142,26 +144,26 @@ const TableItem: React.FC<TableItemProps> = ({ lastOrder, number, status }) => {
         return [Math.round(-value), unit];
     }, [lastOrder]);
 
-    console.log(lastOrderText);
-
     return (
-        <li className="grid grid-cols-2 grid-rows-[auto_1fr] gap-2 rounded-xl bg-white px-2 py-3">
-            <p className="col-span-2 row-span-1 text-center text-xs">
-                Table {number.toString().padStart(2, "0")}
-            </p>
-            <div className="col-start-1 col-end-1 row-span-2 flex flex-col gap-0.5 text-center text-sm">
-                <span>Last order</span>
-                <span className="font-medium">
-                    {new Intl.RelativeTimeFormat("en-US", {
-                        style: "short",
-                        numeric: "always",
-                    }).format(...lastOrderText)}
-                </span>
-            </div>
-            <div className="col-start-2 row-span-2 flex flex-col gap-0.5 text-center text-sm">
-                <span>Status</span>
-                <span className="font-medium">{statusText}</span>
-            </div>
-        </li>
+        <Link passHref href={`/table/${id}`}>
+            <li className="grid grid-cols-2 grid-rows-[auto_1fr] gap-2 rounded-xl bg-white px-2 py-3">
+                <p className="col-span-2 row-span-1 text-center text-xs">
+                    Table {number.toString().padStart(2, "0")}
+                </p>
+                <div className="col-start-1 col-end-1 row-span-2 flex flex-col gap-0.5 text-center text-sm">
+                    <span>Last order</span>
+                    <span className="font-medium">
+                        {new Intl.RelativeTimeFormat("en-US", {
+                            style: "short",
+                            numeric: "always",
+                        }).format(...lastOrderText)}
+                    </span>
+                </div>
+                <div className="col-start-2 row-span-2 flex flex-col gap-0.5 text-center text-sm">
+                    <span>Status</span>
+                    <span className="font-medium">{statusText}</span>
+                </div>
+            </li>
+        </Link>
     );
 };

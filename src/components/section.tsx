@@ -27,6 +27,7 @@ type SectionHeaderProps = {
 export const SectionHeader: React.FC<
     React.PropsWithChildren<SectionHeaderProps>
 > = ({ children, title, subtitle, ...props }) => {
+    const effectiveTitle = title || children;
     return (
         <header
             className={clsx(
@@ -35,8 +36,9 @@ export const SectionHeader: React.FC<
             )}
             {...props}
         >
-            {!title && children}
-            {title && <h3 className="text-xl font-semibold">{title}</h3>}
+            {effectiveTitle && (
+                <h3 className="text-xl font-semibold">{effectiveTitle}</h3>
+            )}
             {title && subtitle && <p className="text-sm">{subtitle}</p>}
         </header>
     );

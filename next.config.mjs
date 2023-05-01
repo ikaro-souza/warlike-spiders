@@ -13,7 +13,11 @@ const config = {
     },
     images: {
         dangerouslyAllowSVG: true,
-        domains: ["api.dicebear.com"],
+        domains: [
+            "api.dicebear.com",
+            "images.unsplash.com",
+            "via.placeholder.com",
+        ],
     },
 };
 export default config;
