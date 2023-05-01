@@ -100,6 +100,7 @@ function Page({
                                         <ListItemImage
                                             alt={x.client.name}
                                             url={x.item.image}
+                                            className="rounded-lg"
                                         />
                                     }
                                     key={x.id}
