@@ -7,15 +7,15 @@ import { api } from "y/utils/api";
 import "y/styles/globals.css";
 
 const MyApp: AppType<{ session: Session | null }> = ({
-  Component,
-  pageProps: { session, ...pageProps },
+    Component,
+    pageProps: { session, ...pageProps },
 }) => {
-  return (
-    <SessionProvider session={session}>
-      <Component {...pageProps} />
-      <Analytics />
-    </SessionProvider>
-  );
+    return (
+        <SessionProvider session={session}>
+            <Component {...pageProps} />
+            <Analytics />
+        </SessionProvider>
+    );
 };
 
 export default api.withTRPC(MyApp);

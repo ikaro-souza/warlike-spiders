@@ -7,7 +7,7 @@ import { tableRouter } from "./routers/table";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  table: tableRouter,
+    table: tableRouter,
 });
 
 // export type definition of API
