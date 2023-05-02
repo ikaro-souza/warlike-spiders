@@ -130,12 +130,3 @@ const TableStat: React.FC<{ label: string; value: string }> = ({
         </section>
     );
 };
-function ImageLoader() {
-    return (
-        <div
-            role="img"
-            aria-label="loading"
-            className="h-12 w-12 animate-pulse rounded-full"
-        ></div>
-    );
-}
