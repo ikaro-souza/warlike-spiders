@@ -7,7 +7,7 @@
 /coverage
 
 # database
-/prisma/
+/prisma/schema.prisma
 
 # next.js
 /.next/

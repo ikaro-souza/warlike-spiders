@@ -5,8 +5,9 @@ import React from "react";
 type ListItemProps = {
     className?: string;
     headline: string;
-    leading?: React.ReactNode;
     overline?: string;
+    supportingText?: string;
+    leading?: React.ReactNode;
     trailing?: React.ReactNode;
 };
 
@@ -15,6 +16,7 @@ export const ListItem: React.FC<ListItemProps> = ({
     headline,
     leading,
     overline,
+    supportingText,
     trailing,
 }) => {
     return (
@@ -30,6 +32,9 @@ export const ListItem: React.FC<ListItemProps> = ({
                     </span>
                 )}
                 <p className="text-sm leading-[18px]">{headline}</p>
+                {supportingText && (
+                    <span className="text-sm opacity-50">{supportingText}</span>
+                )}
             </div>
             {trailing}
         </div>

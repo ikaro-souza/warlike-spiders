@@ -2,6 +2,10 @@ generator client {
     provider = "prisma-client-js"
 }
 
+generator erd {
+    provider = "prisma-erd-generator"
+}
+
 datasource db {
     provider     = "mysql"
     url          = env("DATABASE_URL")
@@ -56,6 +60,7 @@ enum UserRole {
     none
     client
     waiter
+    owner
 }
 
 model VerificationToken {
@@ -67,12 +72,15 @@ model VerificationToken {
 }
 
 model Restaurant {
-    id        String   @id @default(cuid())
-    name      String   @db.VarChar(30)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+    id        String       @id @default(cuid())
+    name      String       @db.VarChar(30)
+    createdAt DateTime     @default(now())
+    updatedAt DateTime     @updatedAt
     ownerId   String
-    owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    owner     User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+    menu      Menu[]
+    inventory Ingredient[]
+    Recipe    Recipe[]
 
     @@index([ownerId])
 }
@@ -80,7 +88,7 @@ model Restaurant {
 model TableSession {
     id        String             @id @default(cuid())
     createdAt DateTime           @default(now())
-    updatedAt DateTime           @default(now())
+    updatedAt DateTime           @updatedAt
     closedAt  DateTime?
     status    TableSessionStatus @default(active)
     waiterId  String
@@ -96,6 +104,116 @@ enum TableSessionStatus {
     closed
 }
 
-model Order {
-    id String @id @default(cuid())
+model Menu {
+    id           String        @id @default(cuid())
+    restaurantId String
+    restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+    sections     MenuSection[]
+
+    @@index([restaurantId])
+}
+
+model MenuSection {
+    id        String     @id @default(cuid())
+    name      String     @db.VarChar(30)
+    highlight Boolean    @default(false)
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    menuId    String
+    menu      Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+    items     MenuItem[]
+
+    @@index([menuId])
+}
+
+model MenuItem {
+    id            String              @id @default(cuid())
+    name          String              @db.VarChar(30)
+    description   String              @db.VarChar(100)
+    unitaryPrice  Float               @default(0) @db.Float
+    createdAt     DateTime            @default(now())
+    updatedAt     DateTime            @updatedAt
+    menuSectionId String
+    menuSection   MenuSection         @relation(fields: [menuSectionId], references: [id], onDelete: Cascade)
+    recipe        RecipeMenuItem?
+    ingredient    IngredientMenuItem?
+
+    @@index([menuSectionId])
+}
+
+model RecipeMenuItem {
+    menuItemId String   @unique
+    menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+    recipeId   String
+    recipe     Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+    @@id([menuItemId, recipeId])
+    @@unique([menuItemId, recipeId])
+    @@index([menuItemId])
+    @@index([recipeId])
+}
+
+model IngredientMenuItem {
+    menuItemId   String     @unique
+    menuItem     MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+    ingredientId String
+    ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+    @@id([menuItemId, ingredientId])
+    @@unique([menuItemId, ingredientId])
+    @@index([menuItemId])
+    @@index([ingredientId])
+}
+
+model Recipe {
+    id           String             @id @default(cuid())
+    name         String             @db.VarChar(30)
+    unitaryCost  Float              @default(0) @db.Float
+    image        String
+    createdAt    DateTime           @default(now())
+    updatedAt    DateTime           @updatedAt
+    ingredients  RecipeIngredient[]
+    restaurantId String
+    restaurant   Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+    menuItems    RecipeMenuItem[]
+
+    @@index([restaurantId])
+}
+
+model RecipeIngredient {
+    ingredientQuantity Int        @db.TinyInt
+    recipeId           String
+    recipe             Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+    ingredientId       String
+    ingredient         Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+    @@id([recipeId, ingredientId])
+    @@index([recipeId])
+    @@index([ingredientId])
+}
+
+model Ingredient {
+    id              String               @id @default(cuid())
+    name            String               @db.VarChar(30)
+    unitaryCost     Float                @default(0) @db.Float
+    measurementUnit MeasurementUnit      @default(none)
+    image           String
+    createdAt       DateTime             @default(now())
+    updatedAt       DateTime             @updatedAt
+    restaurantId    String
+    restaurant      Restaurant           @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+    recipes         RecipeIngredient[]
+    menuItems       IngredientMenuItem[]
+
+    @@index([restaurantId])
+}
+
+enum MeasurementUnit {
+    none
+    unit
+    l
+    ml
+    kg
 }

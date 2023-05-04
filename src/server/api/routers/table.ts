@@ -16,7 +16,7 @@ export const tableRouter = createTRPCRouter({
     getWaiterShiftSummary: publicProcedure
         .output(waiterShiftSummarySchema)
         .query(async ({ ctx }) => {
-            await ctx.prisma.order.findFirst();
+            await ctx.prisma.restaurant.findFirst();
 
             const tables: WaiterShiftSummaryTable[] = [
                 {

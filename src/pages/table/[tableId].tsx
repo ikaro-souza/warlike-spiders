@@ -3,6 +3,7 @@ import type {
     GetServerSidePropsContext,
     InferGetServerSidePropsType,
 } from "next";
+import Link from "next/link";
 import superjson from "superjson";
 import { Button } from "y/components/button";
 import { ListItem, ListItemImage } from "y/components/list-item";
@@ -73,17 +74,22 @@ function Page({
                     <SectionBody role="list">
                         {data.occupants.map(x => {
                             return (
-                                <ListItem
+                                <Link
                                     key={x.id}
-                                    headline={x.name}
-                                    leading={
-                                        <ListItemImage
-                                            alt={x.name}
-                                            url={x.image}
-                                        />
-                                    }
-                                    trailing={<Button>Serve</Button>}
-                                />
+                                    href={`/menu/?userId=${x.id}&tableId=${tableId}`}
+                                    passHref
+                                >
+                                    <ListItem
+                                        headline={x.name}
+                                        leading={
+                                            <ListItemImage
+                                                alt={x.name}
+                                                url={x.image}
+                                            />
+                                        }
+                                        trailing={<Button>Serve</Button>}
+                                    />
+                                </Link>
                             );
                         })}
                     </SectionBody>
