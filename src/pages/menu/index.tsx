@@ -32,6 +32,7 @@ export async function getServerSideProps({
 function Page() {
     const { data } = api.restaurant.getMenu.useQuery(undefined, {
         staleTime: 600,
+        refetchOnWindowFocus: false,
     });
     if (!data) return <></>;
 
