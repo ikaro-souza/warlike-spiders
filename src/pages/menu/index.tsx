@@ -1,7 +1,7 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import type { GetServerSidePropsContext } from "next";
 import superjson from "superjson";
-import { ListItem } from "y/components/list-item";
+import { ListItem, ListItemImage } from "y/components/list-item";
 import { Section, SectionBody, SectionHeader } from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
 import { appRouter } from "y/server/api/root";
@@ -47,10 +47,21 @@ function Page() {
                             {x.items.map(y => (
                                 <ListItem
                                     key={y.id}
-                                    headline={currencyFormatter.format(
-                                        Number(y.unitaryPrice),
-                                    )}
-                                    supportingText={y.name}
+                                    className="bg-background"
+                                    headline={
+                                        <p className="text-base leading-[18px]">
+                                            {currencyFormatter.format(
+                                                Number(y.unitaryPrice),
+                                            )}
+                                        </p>
+                                    }
+                                    supportingText={<span>{y.name}</span>}
+                                    trailing={
+                                        <ListItemImage
+                                            alt={y.name}
+                                            url={y.image}
+                                        />
+                                    }
                                 />
                             ))}
                         </SectionBody>

@@ -117,10 +117,10 @@ model Menu {
 
 model MenuSection {
     id        String     @id @default(cuid())
-    name      String     @db.VarChar(30)
-    highlight Boolean    @default(false)
     createdAt DateTime   @default(now())
     updatedAt DateTime   @updatedAt
+    name      String     @db.VarChar(30)
+    highlight Boolean    @default(false)
     menuId    String
     menu      Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
     items     MenuItem[]
@@ -133,6 +133,7 @@ model MenuItem {
     name          String              @db.VarChar(30)
     description   String              @db.VarChar(100)
     unitaryPrice  Float               @default(0) @db.Float
+    image         String              @default("https://via.placeholder.com/400")
     createdAt     DateTime            @default(now())
     updatedAt     DateTime            @updatedAt
     menuSectionId String
@@ -216,4 +217,5 @@ enum MeasurementUnit {
     l
     ml
     kg
+    g
 }

@@ -1,10 +1,9 @@
 import { z } from "zod";
 
 const baseSchema = z.object({
-    id: z.string(),
+    id: z.string().cuid(),
     createdAt: z.date().default(() => new Date()),
     updatedAt: z.date().default(() => new Date()),
-    deletedAt: z.date().nullable().default(null),
 });
 
 export const userSchema = z.object({
@@ -63,3 +62,22 @@ export const tableSessionSchema = z
     })
     .extend(baseSchema.shape);
 export type TableSession = z.infer<typeof tableSessionSchema>;
+
+export const menuItemSchema = z
+    .object({
+        name: z.string().max(30),
+        description: z.string().max(100),
+        unitaryPrice: z.number(),
+        image: z.string().url(),
+    })
+    .extend(baseSchema.shape);
+export type MenuItem = z.infer<typeof menuItemSchema>;
+
+export const menuSectionSchema = z
+    .object({
+        name: z.string().max(30),
+        highlight: z.boolean(),
+        items: menuItemSchema.array(),
+    })
+    .extend(baseSchema.shape);
+export type MenuSection = z.infer<typeof menuSectionSchema>;

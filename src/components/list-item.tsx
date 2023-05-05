@@ -4,9 +4,9 @@ import React from "react";
 
 type ListItemProps = {
     className?: string;
-    headline: string;
+    headline: React.ReactNode;
     overline?: string;
-    supportingText?: string;
+    supportingText?: React.ReactNode;
     leading?: React.ReactNode;
     trailing?: React.ReactNode;
 };
@@ -31,9 +31,20 @@ export const ListItem: React.FC<ListItemProps> = ({
                         {overline}
                     </span>
                 )}
-                <p className="text-sm leading-[18px]">{headline}</p>
+                {typeof headline === "string" ? (
+                    <p className="text-sm leading-[18px]">{headline}</p>
+                ) : (
+                    headline
+                )}
                 {supportingText && (
-                    <span className="text-sm opacity-50">{supportingText}</span>
+                    <span
+                        className={clsx(
+                            "text-sm",
+                            typeof supportingText === "string" && "opacity-50",
+                        )}
+                    >
+                        {supportingText}
+                    </span>
                 )}
             </div>
             {trailing}
