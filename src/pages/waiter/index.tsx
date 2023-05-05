@@ -1,15 +1,39 @@
+import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { DateTime } from "luxon";
-import type { NextPage } from "next";
+import type { GetServerSidePropsContext } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import superjson from "superjson";
 import { Section, SectionBody, SectionHeader } from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
+import { appRouter } from "y/server/api/root";
+import { createInnerTRPCContext } from "y/server/api/trpc";
+import { getServerAuthSession } from "y/server/auth";
 import { type TableStatus, type WaiterShiftSummary } from "y/server/schemas";
 import { api } from "y/utils/api";
 import { currencyFormatter } from "y/utils/locale";
 
-const Page: NextPage = () => {
+export async function getServerSideProps({
+    req,
+    res,
+}: GetServerSidePropsContext) {
+    const session = await getServerAuthSession({ req, res });
+    const ssg = createProxySSGHelpers({
+        router: appRouter,
+        ctx: createInnerTRPCContext({ session }),
+        transformer: superjson,
+    });
+    await ssg.table.getWaiterShiftSummary.prefetch();
+
+    return {
+        props: {
+            trpcState: ssg.dehydrate(),
+        },
+    };
+}
+
+function Page() {
     const { data } = api.table.getWaiterShiftSummary.useQuery();
 
     return (
@@ -52,7 +76,7 @@ const Page: NextPage = () => {
             </main>
         </>
     );
-};
+}
 
 export default Page;
 
