@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const baseSchema = z.object({
-    id: z.string().cuid(),
+    id: z.string(),
     createdAt: z.date().default(() => new Date()),
     updatedAt: z.date().default(() => new Date()),
 });
@@ -40,29 +40,6 @@ export const waiterShiftSummarySchema = z.object({
 });
 export type WaiterShiftSummary = z.infer<typeof waiterShiftSummarySchema>;
 
-export const tableSessionSchema = z
-    .object({
-        table: z.object({
-            seats: z.number(),
-        }),
-        totalOrdered: z.number(), // TODO: make this a calculated column
-        occupants: userSchema.array(),
-        orderHistory: z
-            .object({
-                client: userSchema,
-                itemQuantity: z.number(),
-                item: z.object({
-                    name: z.string(),
-                    unitaryPrice: z.number(),
-                    image: z.string(),
-                }),
-            })
-            .extend(baseSchema.shape)
-            .array(),
-    })
-    .extend(baseSchema.shape);
-export type TableSession = z.infer<typeof tableSessionSchema>;
-
 export const menuItemSchema = z
     .object({
         name: z.string().max(30),
@@ -81,3 +58,56 @@ export const menuSectionSchema = z
     })
     .extend(baseSchema.shape);
 export type MenuSection = z.infer<typeof menuSectionSchema>;
+
+export const orderItemSchema = z
+    .object({
+        itemId: z.string().cuid(),
+        item: menuItemSchema,
+        itemQuantity: z.number().positive(),
+    })
+    .extend(baseSchema.shape);
+
+export const orderSchema = z
+    .object({
+        completedAt: z.date().nullable(),
+        canceled: z.boolean(),
+        customerId: z.string(),
+        items: orderItemSchema.array(),
+    })
+    .extend(baseSchema.shape);
+export type Order = z.infer<typeof orderSchema>;
+
+const orderHistoryItemSchema = orderItemSchema
+    .pick({ itemId: true, itemQuantity: true })
+    .merge(
+        menuItemSchema.pick({
+            name: true,
+            description: true,
+            unitaryPrice: true,
+            image: true,
+        }),
+    );
+export type OrderHistoryItem = z.infer<typeof orderHistoryItemSchema>;
+
+export const orderHistorySchema = orderSchema
+    .pick({ id: true, customerId: true })
+    .merge(z.object({ items: orderHistoryItemSchema.array().nonempty() }))
+    .array();
+export type OrderHistory = z.infer<typeof orderHistorySchema>;
+
+export const tableSessionCustomerSchema = userSchema.pick({
+    name: true,
+    id: true,
+    image: true,
+});
+export type TableSessionCustomer = z.infer<typeof tableSessionCustomerSchema>;
+
+export const tableSessionSchema = z
+    .object({
+        totalOrdered: z.number(),
+        customers: tableSessionCustomerSchema.array(),
+        orderHistory: orderHistorySchema,
+        closedAt: z.date().nullable(),
+    })
+    .extend(baseSchema.shape);
+export type TableSession = z.infer<typeof tableSessionSchema>;

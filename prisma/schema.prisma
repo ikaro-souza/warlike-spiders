@@ -44,16 +44,17 @@ model Session {
 }
 
 model User {
-    id            String       @id @default(cuid())
+    id            String                 @id @default(cuid())
     name          String?
-    email         String?      @unique
+    email         String?                @unique
     emailVerified DateTime?
     image         String?
-    role          UserRole     @default(none)
+    role          UserRole               @default(none)
+    deletedAt     DateTime?
     accounts      Account[]
     sessions      Session[]
-    restaurant    Restaurant[]
-    deletedAt     DateTime?
+    restaurants   Restaurant[]
+    tableSessions TableSessionCustomer[]
 }
 
 enum UserRole {
@@ -80,28 +81,36 @@ model Restaurant {
     owner     User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
     menu      Menu[]
     inventory Ingredient[]
-    Recipe    Recipe[]
+    recipes   Recipe[]
 
     @@index([ownerId])
 }
 
-model TableSession {
-    id        String             @id @default(cuid())
-    createdAt DateTime           @default(now())
-    updatedAt DateTime           @updatedAt
-    closedAt  DateTime?
-    status    TableSessionStatus @default(active)
-    waiterId  String
+model TableSessionCustomer {
+    id             String       @id @default(cuid())
+    createdAt      DateTime     @default(now())
+    updatedAt      DateTime     @updatedAt
+    closedAt       DateTime?
+    tableSessionId String
+    tableSession   TableSession @relation(fields: [tableSessionId], references: [id], onDelete: Cascade)
+    customerId     String
+    customer       User         @relation(fields: [customerId], references: [id], onDelete: Cascade)
+    orders         Order[]
 
-    @@index([waiterId])
+    @@index([tableSessionId])
+    @@index([customerId])
 }
 
-enum TableSessionStatus {
-    active
-    requesting_waiter
-    ordering
-    waiting_order
-    closed
+model TableSession {
+    id        String                 @id @default(cuid())
+    createdAt DateTime               @default(now())
+    updatedAt DateTime               @updatedAt
+    closedAt  DateTime?
+    status    TableSessionStatus     @default(active)
+    waiterId  String
+    customers TableSessionCustomer[]
+
+    @@index([waiterId])
 }
 
 model Menu {
@@ -140,6 +149,7 @@ model MenuItem {
     menuSection   MenuSection         @relation(fields: [menuSectionId], references: [id], onDelete: Cascade)
     recipe        RecipeMenuItem?
     ingredient    IngredientMenuItem?
+    orders        OrderItem[]
 
     @@index([menuSectionId])
 }
@@ -197,18 +207,43 @@ model RecipeIngredient {
 
 model Ingredient {
     id              String               @id @default(cuid())
+    createdAt       DateTime             @default(now())
+    updatedAt       DateTime             @updatedAt
     name            String               @db.VarChar(30)
     unitaryCost     Float                @default(0) @db.Float
     measurementUnit MeasurementUnit      @default(none)
     image           String
-    createdAt       DateTime             @default(now())
-    updatedAt       DateTime             @updatedAt
     restaurantId    String
     restaurant      Restaurant           @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
     recipes         RecipeIngredient[]
     menuItems       IngredientMenuItem[]
 
     @@index([restaurantId])
+}
+
+model Order {
+    id          String               @id @default(cuid())
+    createdAt   DateTime             @default(now())
+    updatedAt   DateTime             @updatedAt
+    completedAt DateTime?
+    canceled    Boolean              @default(false)
+    customerId  String
+    customer    TableSessionCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+    items       OrderItem[]
+
+    @@index([customerId])
+}
+
+model OrderItem {
+    id           String   @id @default(cuid())
+    itemId       String
+    item         MenuItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+    itemQuantity Int      @db.UnsignedTinyInt
+    orderId      String
+    order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+    @@index([itemId])
+    @@index([orderId])
 }
 
 enum MeasurementUnit {
@@ -218,4 +253,12 @@ enum MeasurementUnit {
     ml
     kg
     g
+}
+
+enum TableSessionStatus {
+    active
+    requesting_waiter
+    ordering
+    waiting_order
+    closed
 }

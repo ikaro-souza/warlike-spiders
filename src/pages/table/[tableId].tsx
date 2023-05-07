@@ -6,7 +6,15 @@ import type {
 import Link from "next/link";
 import superjson from "superjson";
 import { Button } from "y/components/button";
-import { ListItem, ListItemImage } from "y/components/list-item";
+import {
+    ListItem,
+    ListItemContent,
+    ListItemHeadline,
+    ListItemImage,
+    ListItemLeading,
+    ListItemOverline,
+    ListItemTrailing,
+} from "y/components/list-item";
 import { Section, SectionBody, SectionHeader } from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
 import { appRouter } from "y/server/api/root";
@@ -56,7 +64,7 @@ function Page({
                 <header className="grid grid-cols-3 bg-white p-5">
                     <TableStat
                         label="Occupants"
-                        value={data.occupants.length
+                        value={data.customers.length
                             .toString()
                             .padStart(2, "0")}
                     />
@@ -69,52 +77,71 @@ function Page({
                         value={formatTableSessionOpenTime(data.createdAt)}
                     />
                 </header>
-                <Section className="px-0">
-                    <SectionHeader className="px-5">Clients</SectionHeader>
-                    <SectionBody role="list">
-                        {data.occupants.map(x => {
-                            return (
-                                <Link
-                                    key={x.id}
-                                    href={`/menu/?userId=${x.id}&tableId=${tableId}`}
-                                    passHref
-                                >
-                                    <ListItem
-                                        headline={x.name}
-                                        leading={
+                <div className="flex flex-col gap-5">
+                    <Section className="pt-7">
+                        <SectionHeader className="px-5">
+                            Customers
+                        </SectionHeader>
+                        <SectionBody role="list">
+                            {data.customers.map(x => {
+                                return (
+                                    <Link
+                                        key={x.id}
+                                        href={`/menu/?userId=${x.id}&tableId=${tableId}`}
+                                        passHref
+                                    >
+                                        <ListItem className="bg-white">
+                                            <ListItemLeading>
+                                                <ListItemImage
+                                                    alt={x.name}
+                                                    url={x.image}
+                                                />
+                                            </ListItemLeading>
+                                            <ListItemContent>
+                                                <ListItemHeadline>
+                                                    {x.name}
+                                                </ListItemHeadline>
+                                            </ListItemContent>
+                                            <ListItemTrailing className="flex items-center">
+                                                <Button>Serve</Button>
+                                            </ListItemTrailing>
+                                        </ListItem>
+                                    </Link>
+                                );
+                            })}
+                        </SectionBody>
+                    </Section>
+                    <Section>
+                        <SectionHeader className="px-5">Orders</SectionHeader>
+                        <SectionBody role="list">
+                            {data.orderHistory.map(x => {
+                                const customer = data.customers.find(
+                                    customer => customer.id === x.customerId,
+                                );
+                                return (
+                                    <ListItem key={x.id} className="bg-white">
+                                        <ListItemLeading>
                                             <ListItemImage
-                                                alt={x.name}
-                                                url={x.image}
+                                                alt={customer?.name ?? ""}
+                                                url={customer?.image ?? ""}
                                             />
-                                        }
-                                        trailing={<Button>Serve</Button>}
-                                    />
-                                </Link>
-                            );
-                        })}
-                    </SectionBody>
-                </Section>
-                <Section className="px-0">
-                    <SectionHeader className="px-5">Orders</SectionHeader>
-                    <SectionBody role="list">
-                        {data.orderHistory.map(x => {
-                            return (
-                                <ListItem
-                                    headline={`Has ordered ${x.itemQuantity} ${x.item.name}`}
-                                    overline={x.client.name}
-                                    leading={
-                                        <ListItemImage
-                                            alt={x.client.name}
-                                            url={x.item.image}
-                                            className="rounded-lg"
-                                        />
-                                    }
-                                    key={x.id}
-                                />
-                            );
-                        })}
-                    </SectionBody>
-                </Section>
+                                        </ListItemLeading>
+                                        <ListItemContent>
+                                            <ListItemOverline>
+                                                {customer?.name}
+                                            </ListItemOverline>
+                                            <ListItemHeadline>{`Has ordered ${x.items[0].itemQuantity
+                                                .toString()
+                                                .padStart(2, "0")} ${
+                                                x.items[0].name
+                                            }`}</ListItemHeadline>
+                                        </ListItemContent>
+                                    </ListItem>
+                                );
+                            })}
+                        </SectionBody>
+                    </Section>
+                </div>
             </main>
         </>
     );

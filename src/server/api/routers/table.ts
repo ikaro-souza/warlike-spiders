@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { createId } from "@paralleldrive/cuid2";
 import { DateTime } from "luxon";
-import * as uuid from "uuid";
 import { createTRPCRouter, publicProcedure } from "y/server/api/trpc";
 import {
+    orderHistorySchema,
+    orderSchema,
+    tableSessionCustomerSchema,
     tableSessionSchema,
-    userSchema,
     waiterShiftSummarySchema,
+    type Order,
+    type OrderHistoryItem,
+    type TableSessionCustomer,
     type WaiterShiftSummaryTable,
 } from "y/server/schemas";
 import { z } from "zod";
@@ -20,31 +25,31 @@ export const tableRouter = createTRPCRouter({
 
             const tables: WaiterShiftSummaryTable[] = [
                 {
-                    id: uuid.v4(),
+                    id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 25 }).toJSDate(),
                     number: 8,
                     status: "requesting_waiter",
                 },
                 {
-                    id: uuid.v4(),
+                    id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 2 }).toJSDate(),
                     number: 3,
                     status: "waiting_order",
                 },
                 {
-                    id: uuid.v4(),
+                    id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 15 }).toJSDate(),
                     number: 1,
                     status: "waiting_order",
                 },
                 {
-                    id: uuid.v4(),
+                    id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 40 }).toJSDate(),
                     number: 4,
                     status: "open",
                 },
                 {
-                    id: uuid.v4(),
+                    id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 63 }).toJSDate(),
                     number: 9,
                     status: "open",
@@ -62,79 +67,99 @@ export const tableRouter = createTRPCRouter({
         .input(z.string())
         .output(tableSessionSchema)
         .query(async ({ ctx }) => {
-            const users = await ctx.prisma.user.findMany({
-                where: {
-                    name: {
-                        not: { contains: "ikaro" },
+            const tableSession = await ctx.prisma.tableSession.findFirstOrThrow(
+                {
+                    include: {
+                        customers: {
+                            select: {
+                                customer: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        image: true,
+                                    },
+                                },
+                                orders: {
+                                    include: {
+                                        items: {
+                                            include: {
+                                                item: true,
+                                            },
+                                        },
+                                    },
+                                    orderBy: { createdAt: "desc" },
+                                },
+                            },
+                        },
                     },
                 },
-                select: {
-                    id: true,
-                    image: true,
-                    name: true,
-                },
-            });
+            );
 
-            const occupants = users.map(x => userSchema.parse(x));
+            const customers: TableSessionCustomer[] = [];
+            const orders: Order[] = [];
+            const items: OrderHistoryItem[] = [];
+
+            for (
+                let index = 0;
+                index < tableSession.customers.length;
+                index++
+            ) {
+                const customer = tableSession.customers[index];
+                if (customer) {
+                    customers.push(
+                        tableSessionCustomerSchema.parse(customer.customer),
+                    );
+                    orders.push(
+                        ...customer.orders.map(x =>
+                            orderSchema.parse({
+                                ...x,
+                                customerId: customer.customer.id,
+                            }),
+                        ),
+                    );
+
+                    orders.forEach((order, index) => {
+                        items.push(
+                            ...order.items.map<OrderHistoryItem>(orderItem => {
+                                return {
+                                    description: orderItem.item.description,
+                                    image: orderItem.item.image,
+                                    itemId: orderItem.itemId,
+                                    itemQuantity: orderItem.itemQuantity,
+                                    name: orderItem.item.name,
+                                    unitaryPrice: orderItem.item.unitaryPrice,
+                                };
+                            }),
+                        );
+                        orders[index] = {
+                            ...order,
+                            customerId: customer.customer.id,
+                        };
+                    });
+                }
+            }
+
+            let totalOrdered = 0;
+            for (let index = 0; index < orders.length; index++) {
+                const order = orders[index];
+                if (order) {
+                    totalOrdered += order.items.reduce(
+                        (acc, item) =>
+                            acc + item.itemQuantity * item.item.unitaryPrice,
+                        0,
+                    );
+                }
+            }
             return {
-                occupants,
-                orderHistory: [
-                    {
-                        client: occupants[0]!,
-                        id: uuid.v4(),
-                        item: {
-                            name: "Product X",
-                            unitaryPrice: 12.5,
-                            image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8N3x8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60",
-                        },
-                        itemQuantity: 2,
-                        createdAt: DateTime.now()
-                            .minus({ minutes: 30 })
-                            .toJSDate(),
-                        updatedAt: DateTime.now()
-                            .minus({ minutes: 30 })
-                            .toJSDate(),
-                    },
-                    {
-                        client: occupants[3]!,
-                        id: uuid.v4(),
-                        item: {
-                            name: "Product Y",
-                            unitaryPrice: 20.9,
-                            image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8Nnx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60",
-                        },
-                        itemQuantity: 1,
-                        createdAt: DateTime.now()
-                            .minus({ minutes: 32 })
-                            .toJSDate(),
-                        updatedAt: DateTime.now()
-                            .minus({ minutes: 32 })
-                            .toJSDate(),
-                    },
-                    {
-                        client: occupants[2]!,
-                        id: uuid.v4(),
-                        item: {
-                            name: "Product Z",
-                            unitaryPrice: 8.5,
-                            image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8NHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60",
-                        },
-                        itemQuantity: 2,
-                        createdAt: DateTime.now()
-                            .minus({ minutes: 52 })
-                            .toJSDate(),
-                        updatedAt: DateTime.now()
-                            .minus({ minutes: 52 })
-                            .toJSDate(),
-                    },
-                ],
-                totalOrdered: 420.69,
-                id: uuid.v4(),
-                table: {
-                    seats: 4,
-                },
+                customers: customers,
+                id: tableSession.id,
+                orderHistory: orderHistorySchema.parse(
+                    orders.map(order => ({ ...order, items })),
+                ),
+                totalOrdered,
                 createdAt: DateTime.now().minus({ minutes: 48 }).toJSDate(),
-                updatedAt: DateTime.now().minus({ minutes: 48 }).toJSDate(),
+                updatedAt: tableSession.updatedAt,
+                closedAt: tableSession.closedAt,
             };
         }),
 });
