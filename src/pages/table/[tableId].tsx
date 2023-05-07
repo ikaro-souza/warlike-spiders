@@ -1,4 +1,5 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
+import clsx from "clsx";
 import type {
     GetServerSidePropsContext,
     InferGetServerSidePropsType,
@@ -118,6 +119,7 @@ function Page({
                                 const customer = data.customers.find(
                                     customer => customer.id === x.customerId,
                                 );
+
                                 return (
                                     <ListItem key={x.id} className="bg-white">
                                         <ListItemLeading>
@@ -128,13 +130,29 @@ function Page({
                                         </ListItemLeading>
                                         <ListItemContent>
                                             <ListItemOverline>
-                                                {customer?.name}
+                                                {customer?.name} has ordered:
                                             </ListItemOverline>
-                                            <ListItemHeadline>{`Has ordered ${x.items[0].itemQuantity
-                                                .toString()
-                                                .padStart(2, "0")} ${
-                                                x.items[0].name
-                                            }`}</ListItemHeadline>
+                                            <ListItemHeadline
+                                                className={clsx(
+                                                    x.items.length &&
+                                                        "flex flex-col",
+                                                )}
+                                            >
+                                                {x.items.map(item => {
+                                                    return (
+                                                        <span key={item.itemId}>
+                                                            {`${item.itemQuantity
+                                                                .toString()
+                                                                .padStart(
+                                                                    2,
+                                                                    "0",
+                                                                )} ${
+                                                                item.name
+                                                            }`}
+                                                        </span>
+                                                    );
+                                                })}
+                                            </ListItemHeadline>
                                         </ListItemContent>
                                     </ListItem>
                                 );

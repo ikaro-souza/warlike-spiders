@@ -104,40 +104,38 @@ export const tableRouter = createTRPCRouter({
                 index < tableSession.customers.length;
                 index++
             ) {
-                const customer = tableSession.customers[index];
-                if (customer) {
+                const tableSessionCustomer = tableSession.customers[index];
+                if (tableSessionCustomer) {
                     customers.push(
-                        tableSessionCustomerSchema.parse(customer.customer),
+                        tableSessionCustomerSchema.parse(
+                            tableSessionCustomer.customer,
+                        ),
                     );
                     orders.push(
-                        ...customer.orders.map(x =>
+                        ...tableSessionCustomer.orders.map(x =>
                             orderSchema.parse({
                                 ...x,
-                                customerId: customer.customer.id,
+                                customerId: tableSessionCustomer.customer.id,
                             }),
                         ),
                     );
-
-                    orders.forEach((order, index) => {
-                        items.push(
-                            ...order.items.map<OrderHistoryItem>(orderItem => {
-                                return {
-                                    description: orderItem.item.description,
-                                    image: orderItem.item.image,
-                                    itemId: orderItem.itemId,
-                                    itemQuantity: orderItem.itemQuantity,
-                                    name: orderItem.item.name,
-                                    unitaryPrice: orderItem.item.unitaryPrice,
-                                };
-                            }),
-                        );
-                        orders[index] = {
-                            ...order,
-                            customerId: customer.customer.id,
-                        };
-                    });
                 }
             }
+
+            orders.forEach(order => {
+                items.push(
+                    ...order.items.map<OrderHistoryItem>(orderItem => {
+                        return {
+                            description: orderItem.item.description,
+                            image: orderItem.item.image,
+                            itemId: orderItem.itemId,
+                            itemQuantity: orderItem.itemQuantity,
+                            name: orderItem.item.name,
+                            unitaryPrice: orderItem.item.unitaryPrice,
+                        };
+                    }),
+                );
+            });
 
             let totalOrdered = 0;
             for (let index = 0; index < orders.length; index++) {
@@ -150,6 +148,7 @@ export const tableRouter = createTRPCRouter({
                     );
                 }
             }
+
             return {
                 customers: customers,
                 id: tableSession.id,
