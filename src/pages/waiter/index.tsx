@@ -63,14 +63,16 @@ function Page() {
                                 {!data && "loading"}
                             </>
                         }
+                        className="px-5"
                     />
-                    <SectionBody aria-label="Tables being served">
-                        <ul className="flex flex-col gap-3">
-                            {data &&
-                                data.servingTables.map(x => (
-                                    <TableItem key={x.number} {...x} />
-                                ))}
-                        </ul>
+                    <SectionBody
+                        aria-label="Tables being served"
+                        className="flex flex-col gap-3"
+                    >
+                        {data &&
+                            data.servingTables.map(x => (
+                                <TableItem key={x.number} {...x} />
+                            ))}
                     </SectionBody>
                 </Section>
             </main>
