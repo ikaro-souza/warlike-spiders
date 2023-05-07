@@ -139,7 +139,7 @@ model MenuSection {
 
 model MenuItem {
     id            String              @id @default(cuid())
-    name          String              @db.VarChar(30)
+    name          String              @db.VarChar(50)
     description   String              @db.VarChar(100)
     unitaryPrice  Float               @default(0) @db.Float
     image         String              @default("https://via.placeholder.com/400")

@@ -42,7 +42,7 @@ export type WaiterShiftSummary = z.infer<typeof waiterShiftSummarySchema>;
 
 export const menuItemSchema = z
     .object({
-        name: z.string().max(30),
+        name: z.string().max(50),
         description: z.string().max(100),
         unitaryPrice: z.number(),
         image: z.string().url(),
@@ -52,7 +52,7 @@ export type MenuItem = z.infer<typeof menuItemSchema>;
 
 export const menuSectionSchema = z
     .object({
-        name: z.string().max(30),
+        name: z.string().max(50),
         highlight: z.boolean(),
         items: menuItemSchema.array(),
     })
