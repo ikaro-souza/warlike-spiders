@@ -9,9 +9,9 @@ export const Section: React.FC<React.PropsWithChildren<SectionProps>> = ({
     ...props
 }) => {
     return (
-        <article className={clsx("flex flex-col gap-4", className)} {...props}>
+        <section className={clsx("flex flex-col gap-4", className)} {...props}>
             {children}
-        </article>
+        </section>
     );
 };
 

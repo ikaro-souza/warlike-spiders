@@ -1,7 +1,23 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
+import clsx from "clsx";
 import type { GetServerSidePropsContext } from "next";
 import superjson from "superjson";
-import { ListItem, ListItemImage } from "y/components/list-item";
+import {
+    HighlightedSectionItem,
+    HighlightedSectionItemContent,
+    HighlightedSectionItemDescription,
+    HighlightedSectionItemHeader,
+    HighlightedSectionItemImage,
+    HighlightedSectionItemTitle,
+} from "y/components/highlighted-section-item";
+import {
+    ListItem,
+    ListItemContent,
+    ListItemHeadline,
+    ListItemImage,
+    ListItemSupportingText,
+    ListItemTrailing,
+} from "y/components/list-item";
 import { Section, SectionBody, SectionHeader } from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
 import { appRouter } from "y/server/api/root";
@@ -41,29 +57,60 @@ function Page() {
             <TopAppBar showPreviousButton />
             <main>
                 {data.sections.map(x => (
-                    <Section key={x.id}>
-                        <SectionHeader>{x.name}</SectionHeader>
-                        <SectionBody role="list">
-                            {x.items.map(y => (
-                                <ListItem
-                                    key={y.id}
-                                    className="bg-background"
-                                    headline={
-                                        <p className="text-base leading-[18px]">
-                                            {currencyFormatter.format(
-                                                Number(y.unitaryPrice),
-                                            )}
-                                        </p>
-                                    }
-                                    supportingText={<span>{y.name}</span>}
-                                    trailing={
-                                        <ListItemImage
-                                            alt={y.name}
-                                            url={y.image}
-                                        />
-                                    }
-                                />
-                            ))}
+                    <Section key={x.id} className="py-5">
+                        <SectionHeader className="px-5">{x.name}</SectionHeader>
+                        <SectionBody
+                            className={clsx(x.highlight && "flex-row px-5")}
+                            role="list"
+                        >
+                            {x.items.map(y => {
+                                if (x.highlight)
+                                    return (
+                                        <HighlightedSectionItem>
+                                            <HighlightedSectionItemHeader
+                                                title={y.name}
+                                            >
+                                                <HighlightedSectionItemImage
+                                                    alt={y.name}
+                                                    src={y.image}
+                                                />
+                                            </HighlightedSectionItemHeader>
+                                            <HighlightedSectionItemContent>
+                                                <HighlightedSectionItemTitle>
+                                                    {currencyFormatter.format(
+                                                        y.unitaryPrice,
+                                                    )}
+                                                </HighlightedSectionItemTitle>
+                                                <HighlightedSectionItemDescription>
+                                                    {y.name} asbdiahsidhas
+                                                    asuidhasid
+                                                </HighlightedSectionItemDescription>
+                                            </HighlightedSectionItemContent>
+                                        </HighlightedSectionItem>
+                                    );
+
+                                return (
+                                    <ListItem key={y.id}>
+                                        <ListItemContent className="gap-2">
+                                            <ListItemHeadline className="text-base">
+                                                {currencyFormatter.format(
+                                                    Number(y.unitaryPrice),
+                                                )}
+                                            </ListItemHeadline>
+                                            <ListItemSupportingText className="opacity-100">
+                                                {y.name}
+                                            </ListItemSupportingText>
+                                        </ListItemContent>
+                                        <ListItemTrailing>
+                                            <ListItemImage
+                                                className="rounded-lg"
+                                                alt={y.name}
+                                                url={y.image}
+                                            />
+                                        </ListItemTrailing>
+                                    </ListItem>
+                                );
+                            })}
                         </SectionBody>
                     </Section>
                 ))}
