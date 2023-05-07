@@ -82,8 +82,7 @@ function Page() {
                                                     )}
                                                 </HighlightedSectionItemTitle>
                                                 <HighlightedSectionItemDescription>
-                                                    {y.name} asbdiahsidhas
-                                                    asuidhasid
+                                                    {y.name}
                                                 </HighlightedSectionItemDescription>
                                             </HighlightedSectionItemContent>
                                         </HighlightedSectionItem>
