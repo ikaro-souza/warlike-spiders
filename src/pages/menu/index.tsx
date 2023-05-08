@@ -36,7 +36,7 @@ export async function getServerSideProps({
         ctx: createInnerTRPCContext({ session }),
         transformer: superjson,
     });
-    await ssg.restaurant.getMenu.prefetch();
+    await ssg.menu.getMenu.prefetch();
 
     return {
         props: {
@@ -46,7 +46,7 @@ export async function getServerSideProps({
 }
 
 function Page() {
-    const { data } = api.restaurant.getMenu.useQuery(undefined, {
+    const { data } = api.menu.getMenu.useQuery(undefined, {
         staleTime: 600,
         refetchOnWindowFocus: false,
     });
@@ -69,7 +69,10 @@ function Page() {
                             {x.items.map(y => {
                                 if (x.highlight)
                                     return (
-                                        <HighlightedSectionItem className="flex-shrink-0">
+                                        <HighlightedSectionItem
+                                            className="flex-shrink-0"
+                                            key={y.id}
+                                        >
                                             <HighlightedSectionItemHeader
                                                 title={y.name}
                                             >
