@@ -64,6 +64,9 @@ dependencies:
   superjson:
     specifier: 1.12.2
     version: 1.12.2
+  tailwind-scrollbar-hide:
+    specifier: ^1.1.7
+    version: 1.1.7
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -3346,6 +3349,10 @@ packages:
       '@pkgr/utils': 2.3.1
       tslib: 2.5.0
     dev: true
+
+  /tailwind-scrollbar-hide@1.1.7:
+    resolution: {integrity: sha512-X324n9OtpTmOMqEgDUEA/RgLrNfBF/jwJdctaPZDzB3mppxJk7TLIDmOreEDm1Bq4R9LSPu4Epf8VSdovNU+iA==}
+    dev: false
 
   /tailwindcss@3.3.0(postcss@8.4.21):
     resolution: {integrity: sha512-hOXlFx+YcklJ8kXiCAfk/FMyr4Pm9ck477G0m/us2344Vuj355IpoEDB5UmGAsSpTBmr+4ZhjzW04JuFXkb/fw==}

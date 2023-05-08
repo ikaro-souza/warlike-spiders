@@ -60,13 +60,16 @@ function Page() {
                     <Section key={x.id} className="py-5">
                         <SectionHeader className="px-5">{x.name}</SectionHeader>
                         <SectionBody
-                            className={clsx(x.highlight && "flex-row px-5")}
+                            className={clsx(
+                                x.highlight &&
+                                    "scroll flex w-screen flex-row gap-4 overflow-x-scroll px-5 scrollbar-hide",
+                            )}
                             role="list"
                         >
                             {x.items.map(y => {
                                 if (x.highlight)
                                     return (
-                                        <HighlightedSectionItem>
+                                        <HighlightedSectionItem className="flex-shrink-0">
                                             <HighlightedSectionItemHeader
                                                 title={y.name}
                                             >

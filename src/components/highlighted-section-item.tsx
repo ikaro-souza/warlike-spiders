@@ -9,7 +9,7 @@ export const HighlightedSectionItem: React.FC<
     return (
         <article
             className={clsx(
-                "aspect-[4/5] w-[50%] overflow-hidden rounded-xl bg-white",
+                "aspect-[4/5] w-1/2 overflow-hidden rounded-xl bg-white",
                 className,
             )}
             {...props}
@@ -58,7 +58,7 @@ type HighlightedSectionItemTitleProps =
     React.HTMLAttributes<HTMLParagraphElement>;
 export const HighlightedSectionItemTitle: React.FC<
     React.PropsWithChildren<HighlightedSectionItemTitleProps>
-> = ({ children, className, ...props }) => {
+> = ({ children, ...props }) => {
     return (
         <p className="text-base font-medium leading-5" {...props}>
             {children}
