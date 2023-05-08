@@ -129,26 +129,26 @@ function Page({
                                             />
                                         </ListItemLeading>
                                         <ListItemContent>
-                                            <ListItemOverline>
+                                            <ListItemOverline className="opacity-50">
                                                 {customer?.name} has ordered:
                                             </ListItemOverline>
                                             <ListItemHeadline
                                                 className={clsx(
                                                     x.items.length &&
-                                                        "flex flex-col",
+                                                        "flex flex-col text-sm",
                                                 )}
                                             >
                                                 {x.items.map(item => {
                                                     return (
                                                         <span key={item.itemId}>
-                                                            {`${item.itemQuantity
+                                                            {item.itemQuantity
                                                                 .toString()
                                                                 .padStart(
                                                                     2,
                                                                     "0",
-                                                                )} ${
-                                                                item.name
-                                                            }`}
+                                                                )}
+                                                            &nbsp;
+                                                            {item.name}
                                                         </span>
                                                     );
                                                 })}

@@ -82,10 +82,7 @@ export const ListItemOverline: React.FC<
     React.PropsWithChildren<ListItemOverlineProps>
 > = ({ children, className, ...props }) => {
     return (
-        <span
-            className={clsx("text-xs leading-none opacity-50", className)}
-            {...props}
-        >
+        <span className={clsx("text-xs leading-none", className)} {...props}>
             {children}
         </span>
     );
@@ -96,7 +93,7 @@ export const ListItemSupportingText: React.FC<
     React.PropsWithChildren<ListItemSupportingTextProps>
 > = ({ children, className, ...props }) => {
     return (
-        <span className={clsx("text-sm opacity-50", className)} {...props}>
+        <span className={clsx("text-sm", className)} {...props}>
             {children}
         </span>
     );

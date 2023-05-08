@@ -99,7 +99,7 @@ function Page() {
                                                     Number(y.unitaryPrice),
                                                 )}
                                             </ListItemHeadline>
-                                            <ListItemSupportingText className="opacity-100">
+                                            <ListItemSupportingText>
                                                 {y.name}
                                             </ListItemSupportingText>
                                         </ListItemContent>
