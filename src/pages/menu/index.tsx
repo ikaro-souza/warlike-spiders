@@ -1,6 +1,7 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import clsx from "clsx";
 import type { GetServerSidePropsContext } from "next";
+import Link from "next/link";
 import superjson from "superjson";
 import {
     HighlightedSectionItem,
@@ -67,10 +68,13 @@ function Page() {
                             role="list"
                         >
                             {x.items.map(y => {
+                                const href = `/menu/item/${y.id}`;
+
                                 if (x.highlight)
                                     return (
                                         <HighlightedSectionItem
                                             className="flex-shrink-0"
+                                            href={href}
                                             key={y.id}
                                         >
                                             <HighlightedSectionItemHeader
@@ -95,25 +99,27 @@ function Page() {
                                     );
 
                                 return (
-                                    <ListItem key={y.id}>
-                                        <ListItemContent className="gap-2">
-                                            <ListItemHeadline className="text-base">
-                                                {currencyFormatter.format(
-                                                    Number(y.unitaryPrice),
-                                                )}
-                                            </ListItemHeadline>
-                                            <ListItemSupportingText>
-                                                {y.name}
-                                            </ListItemSupportingText>
-                                        </ListItemContent>
-                                        <ListItemTrailing>
-                                            <ListItemImage
-                                                className="rounded-lg"
-                                                alt={y.name}
-                                                url={y.image}
-                                            />
-                                        </ListItemTrailing>
-                                    </ListItem>
+                                    <Link key={y.id} href={href} passHref>
+                                        <ListItem>
+                                            <ListItemContent className="gap-2">
+                                                <ListItemHeadline className="text-base">
+                                                    {currencyFormatter.format(
+                                                        Number(y.unitaryPrice),
+                                                    )}
+                                                </ListItemHeadline>
+                                                <ListItemSupportingText>
+                                                    {y.name}
+                                                </ListItemSupportingText>
+                                            </ListItemContent>
+                                            <ListItemTrailing>
+                                                <ListItemImage
+                                                    className="rounded-lg"
+                                                    alt={y.name}
+                                                    url={y.image}
+                                                />
+                                            </ListItemTrailing>
+                                        </ListItem>
+                                    </Link>
                                 );
                             })}
                         </SectionBody>

@@ -1,13 +1,17 @@
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import { TRPCError } from "@trpc/server";
+import { dbErrorCodes } from "y/server/db";
 import {
     menuItemSchema,
     menuSectionSchema,
     type MenuItem,
     type MenuSection,
 } from "y/server/schemas";
+import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
-export const restaurantRouter = createTRPCRouter({
-    getMenu: publicProcedure.query(async ({ input, ctx }) => {
+export const menuRouter = createTRPCRouter({
+    getMenu: publicProcedure.query(async ({ ctx }) => {
         const menu = await ctx.prisma.menu.findFirstOrThrow({
             include: {
                 sections: {
@@ -60,4 +64,24 @@ export const restaurantRouter = createTRPCRouter({
             sections,
         };
     }),
+    getMenuItem: publicProcedure
+        .input(z.string().cuid())
+        .output(menuItemSchema)
+        .query(async ({ ctx, input }) => {
+            try {
+                const item = await ctx.prisma.menuItem.findFirstOrThrow({
+                    where: {
+                        id: input,
+                    },
+                });
+                return item;
+            } catch (error) {
+                if (
+                    error instanceof PrismaClientKnownRequestError &&
+                    error.code === dbErrorCodes.NOT_FOUND
+                )
+                    throw new TRPCError({ code: "NOT_FOUND" });
+                throw error;
+            }
+        }),
 });

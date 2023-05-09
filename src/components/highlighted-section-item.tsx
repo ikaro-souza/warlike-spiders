@@ -1,21 +1,27 @@
 import clsx from "clsx";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
-type HighlightedSectionItemProps = React.HTMLAttributes<HTMLDivElement>;
+type HighlightedSectionItemProps = React.HTMLAttributes<HTMLDivElement> & {
+    href: string;
+};
 export const HighlightedSectionItem: React.FC<
     React.PropsWithChildren<HighlightedSectionItemProps>
-> = ({ children, className, ...props }) => {
+> = ({ children, className, href, ...props }) => {
     return (
-        <article
+        <Link
             className={clsx(
                 "aspect-[4/5] w-1/2 overflow-hidden rounded-xl bg-white",
                 className,
             )}
-            {...props}
+            href={href}
+            passHref
         >
-            {children}
-        </article>
+            <article className="h-full w-full" {...props}>
+                {children}
+            </article>
+        </Link>
     );
 };
 
