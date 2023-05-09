@@ -47,6 +47,7 @@ function Page() {
                         height={PROFILE_IMAGE_SIZE}
                         width={PROFILE_IMAGE_SIZE}
                         sizes={`${PROFILE_IMAGE_SIZE}px`}
+                        priority
                         className="rounded-full bg-black"
                     />
                     <p>Sammy Scooter</p>
