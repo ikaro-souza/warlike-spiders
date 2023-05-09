@@ -39,9 +39,10 @@ export const ListItemImage: React.FC<ListItemImageProps> = ({
         <Image
             alt={alt}
             src={url}
-            height={48}
-            width={48}
+            height={56}
+            width={56}
             className={clsx("h-12 w-12 rounded-full object-cover", className)}
+            sizes="56px"
         />
     );
 };

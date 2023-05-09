@@ -46,6 +46,7 @@ function Page() {
                         alt="Sammy's profile picture"
                         height={PROFILE_IMAGE_SIZE}
                         width={PROFILE_IMAGE_SIZE}
+                        sizes={`${PROFILE_IMAGE_SIZE}px`}
                         className="rounded-full bg-black"
                     />
                     <p>Sammy Scooter</p>

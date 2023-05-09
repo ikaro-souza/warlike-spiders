@@ -43,7 +43,15 @@ type HighlightedSectionItemImageProps = {
 export const HighlightedSectionItemImage: React.FC<
     HighlightedSectionItemImageProps
 > = ({ alt, src }) => {
-    return <Image src={src} alt={alt} fill className="object-cover" />;
+    return (
+        <Image
+            src={src}
+            alt={alt}
+            fill
+            className="object-cover"
+            sizes="200px"
+        />
+    );
 };
 
 type HighlightedSectionItemContentProps = React.HTMLAttributes<HTMLDivElement>;
