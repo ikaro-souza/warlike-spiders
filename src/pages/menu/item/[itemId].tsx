@@ -46,6 +46,7 @@ export default function Page({ itemId }: PageProps) {
                         fill
                         sizes="400px"
                         aria-hidden
+                        priority
                         className="object-cover"
                     />
                     <div
