@@ -19,11 +19,12 @@ type SectionHeaderProps = {
     flexDirection?: "row" | "column";
     title?: React.ReactNode;
     subtitle?: React.ReactNode;
+    srRonly?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const SectionHeader: React.FC<
     React.PropsWithChildren<SectionHeaderProps>
-> = ({ children, title, subtitle, ...props }) => {
+> = ({ children, title, subtitle, srRonly, ...props }) => {
     const effectiveTitle = title || children;
     return (
         <header
@@ -34,7 +35,14 @@ export const SectionHeader: React.FC<
             {...props}
         >
             {effectiveTitle && (
-                <h3 className="text-xl font-semibold">{effectiveTitle}</h3>
+                <h2
+                    className={clsx(
+                        "text-xl font-semibold",
+                        srRonly && "sr-only",
+                    )}
+                >
+                    {effectiveTitle}
+                </h2>
             )}
             {title && subtitle && <p className="text-sm">{subtitle}</p>}
         </header>

@@ -50,7 +50,7 @@ function Page() {
                         priority
                         className="rounded-full bg-black"
                     />
-                    <p>Sammy Scooter</p>
+                    <h2>Sammy Scooter</h2>
                 </header>
                 <Summary data={data} />
                 <Section>
@@ -70,6 +70,7 @@ function Page() {
                     <SectionBody
                         aria-label="Tables being served"
                         className="flex flex-col gap-3"
+                        role="list"
                     >
                         {data &&
                             data.servingTables.map(x => (
@@ -98,6 +99,7 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
             aria-label="Shift summary"
             className="grid w-full grid-cols-2 grid-rows-2"
         >
+            <h2 className="sr-only">Shift summary</h2>
             <SummaryItem
                 label={"Estimated tips"}
                 value={currencyFormatter.format(data.estimatedTips)}
@@ -173,11 +175,14 @@ const TableItem: React.FC<TableItemProps> = ({
     }, [lastOrder]);
 
     return (
-        <Link passHref href={`/table/${id}`}>
-            <li className="grid grid-cols-2 grid-rows-[auto_1fr] gap-2 rounded-xl bg-white px-2 py-3">
-                <p className="col-span-2 row-span-1 text-center text-xs">
+        <div role="listitem">
+            <Link
+                href={`/table/${id}`}
+                className="grid grid-cols-2 grid-rows-[auto_1fr] gap-2 rounded-xl bg-white px-2 py-3"
+            >
+                <h3 className="col-span-2 row-span-1 text-center text-xs">
                     Table {number.toString().padStart(2, "0")}
-                </p>
+                </h3>
                 <div className="col-start-1 col-end-1 row-span-2 flex flex-col gap-0.5 text-center text-sm">
                     <span>Last order</span>
                     <span className="font-medium">
@@ -191,7 +196,7 @@ const TableItem: React.FC<TableItemProps> = ({
                     <span>Status</span>
                     <span className="font-medium">{statusText}</span>
                 </div>
-            </li>
-        </Link>
+            </Link>
+        </div>
     );
 };
