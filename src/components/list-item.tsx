@@ -6,13 +6,13 @@ type ListItemProps = Omit<
     React.HTMLAttributes<HTMLDivElement>,
     "children" | "role"
 >;
-export const ListItem: React.FC<React.PropsWithChildren<ListItemProps>> = ({
-    className,
-    children,
-    ...props
-}) => {
+export const ListItem = React.forwardRef<
+    HTMLDivElement,
+    React.PropsWithChildren<ListItemProps>
+>(({ children, className, ...props }, ref) => {
     return (
         <div
+            ref={ref}
             role="listitem"
             className={clsx(
                 "flex w-full gap-3 bg-background px-5 py-3 text-black",
@@ -23,7 +23,8 @@ export const ListItem: React.FC<React.PropsWithChildren<ListItemProps>> = ({
             {children}
         </div>
     );
-};
+});
+ListItem.displayName = "ListItem";
 
 type ListItemImageProps = {
     alt: string;
