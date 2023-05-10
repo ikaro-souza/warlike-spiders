@@ -90,6 +90,7 @@ function Page({
                                         key={x.id}
                                         href={`/menu/?userId=${x.id}&tableId=${tableId}`}
                                         passHref
+                                        legacyBehavior
                                     >
                                         <ListItem className="bg-white">
                                             <ListItemLeading>
@@ -176,8 +177,8 @@ const TableStat: React.FC<{ label: string; value: string }> = ({
             className="flex flex-col items-center justify-center gap-1 text-sm"
             aria-labelledby="stat-label"
         >
-            <p id="stat-label">{label}</p>
-            <span className="font-medium">{value}</span>
+            <h2 id="stat-label">{label}</h2>
+            <p className="font-medium">{value}</p>
         </section>
     );
 };
