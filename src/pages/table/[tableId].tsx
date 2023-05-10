@@ -173,11 +173,10 @@ const TableStat: React.FC<{ label: string; value: string }> = ({
     value,
 }) => {
     return (
-        <section
-            className="flex flex-col items-center justify-center gap-1 text-sm"
-            aria-labelledby="stat-label"
-        >
-            <h2 id="stat-label">{label}</h2>
+        <section className="flex flex-col items-center justify-center gap-1 text-sm">
+            <header>
+                <h2>{label}</h2>
+            </header>
             <p className="font-medium">{value}</p>
         </section>
     );
