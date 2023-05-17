@@ -11,7 +11,7 @@ export default {
             },
             colors: {
                 action: "#147efb",
-                background: "#fafafa",
+                background: "#f8f8f8",
             },
             fontFamily: {
                 sans: ["Inter", ...defaultTheme.fontFamily.sans],

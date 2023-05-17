@@ -15,7 +15,7 @@ export const ListItem = React.forwardRef<
             ref={ref}
             role="listitem"
             className={clsx(
-                "flex w-full gap-3 bg-background px-5 py-3 text-black",
+                "flex w-full gap-3 px-5 py-3 text-black",
                 className,
             )}
             {...props}
@@ -30,11 +30,13 @@ type ListItemImageProps = {
     alt: string;
     className?: string;
     url: string;
+    priority?: boolean;
 };
 export const ListItemImage: React.FC<ListItemImageProps> = ({
     alt,
     className,
     url,
+    priority,
 }) => {
     return (
         <Image
@@ -42,8 +44,9 @@ export const ListItemImage: React.FC<ListItemImageProps> = ({
             src={url}
             height={56}
             width={56}
-            className={clsx("h-12 w-12 rounded-full object-cover", className)}
+            className={clsx("h-14 w-14 rounded-full object-cover", className)}
             sizes="56px"
+            priority={priority}
         />
     );
 };

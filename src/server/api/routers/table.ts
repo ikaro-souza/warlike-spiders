@@ -72,6 +72,7 @@ export const tableRouter = createTRPCRouter({
                     include: {
                         customers: {
                             select: {
+                                id: true,
                                 customer: {
                                     select: {
                                         id: true,
@@ -107,24 +108,25 @@ export const tableRouter = createTRPCRouter({
                 const tableSessionCustomer = tableSession.customers[index];
                 if (tableSessionCustomer) {
                     customers.push(
-                        tableSessionCustomerSchema.parse(
-                            tableSessionCustomer.customer,
-                        ),
+                        tableSessionCustomerSchema.parse({
+                            ...tableSessionCustomer.customer,
+                            id: tableSessionCustomer.id,
+                        }),
                     );
                     orders.push(
-                        ...tableSessionCustomer.orders.map(x =>
+                        ...tableSessionCustomer.orders.map((x) =>
                             orderSchema.parse({
                                 ...x,
-                                customerId: tableSessionCustomer.customer.id,
+                                customerId: tableSessionCustomer.id,
                             }),
                         ),
                     );
                 }
             }
 
-            orders.forEach(order => {
+            orders.forEach((order) => {
                 items.push(
-                    ...order.items.map<OrderHistoryItem>(orderItem => {
+                    ...order.items.map<OrderHistoryItem>((orderItem) => {
                         return {
                             description: orderItem.item.description,
                             image: orderItem.item.image,
@@ -153,7 +155,7 @@ export const tableRouter = createTRPCRouter({
                 customers: customers,
                 id: tableSession.id,
                 orderHistory: orderHistorySchema.parse(
-                    orders.map(order => ({ ...order, items })),
+                    orders.map((order) => ({ ...order, items })),
                 ),
                 totalOrdered,
                 createdAt: DateTime.now().minus({ minutes: 48 }).toJSDate(),

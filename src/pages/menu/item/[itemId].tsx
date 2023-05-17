@@ -1,4 +1,4 @@
-import { IconChevronLeft, IconMinus, IconPlus } from "@tabler/icons-react";
+import { IconChevronLeft } from "@tabler/icons-react";
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import { TRPCError } from "@trpc/server";
 import {
@@ -14,35 +14,69 @@ import {
     BottomAppBarPrimaryAction,
 } from "y/components/bottom-app-bar";
 import { Button } from "y/components/button";
+import { QuantityCounter } from "y/components/quanitity-counter";
 import { appRouter } from "y/server/api/root";
 import { createInnerTRPCContext } from "y/server/api/trpc";
 import { getServerAuthSession } from "y/server/auth";
 import { api } from "y/utils/api";
 import { currencyFormatter } from "y/utils/locale";
+import {
+    useAddItemToOrder,
+    useOrderCreationValue,
+    useUpdateItemInOrder,
+} from "y/utils/state";
 
 type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
 export default function Page({ itemId }: PageProps) {
     const router = useRouter();
-    const { data } = api.menu.getMenuItem.useQuery(itemId);
+    const { data: menuItem } = api.menu.getMenuItem.useQuery(itemId);
     const [quantity, setQuantity] = React.useState(1);
+    const [note, setNote] = React.useState<string | undefined>();
+    const orderCreationData = useOrderCreationValue();
+    const updateItemInOrder = useUpdateItemInOrder();
+    const addItemToOrder = useAddItemToOrder();
 
-    if (!data) return <></>;
+    React.useLayoutEffect(() => {
+        if (!menuItem) return;
 
-    const changeQuantity = (action: "add" | "subtract") => {
-        if (action === "add") {
-            setQuantity(quantity + 1);
+        const item = orderCreationData?.items.find((i) => i.itemId === itemId);
+        if (!item) return;
+
+        setQuantity(item.itemQuantity);
+        setNote(item.note ?? undefined);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [orderCreationData]);
+
+    if (!menuItem) return <></>;
+
+    const onAddToCartClick = async () => {
+        // TODO: test this out
+        const orderItem = {
+            item: menuItem,
+            itemId: menuItem.id,
+            itemQuantity: quantity,
+            note,
+        };
+        if (orderCreationData?.items.some((i) => i.itemId === itemId)) {
+            updateItemInOrder(orderItem);
         } else {
-            setQuantity(quantity - 1);
+            addItemToOrder(orderItem);
         }
+        await router.push("/order");
     };
+
+    const onQuantityChange = (q: number): void => setQuantity(q);
+
+    const onNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void =>
+        setNote(e.target.value || undefined);
 
     return (
         <>
             <div className="flex h-screen flex-col pb-20">
                 <header className="relative aspect-[4/3] overflow-clip">
                     <Image
-                        src={data.image}
-                        alt={data.name}
+                        src={menuItem.image}
+                        alt={menuItem.name}
                         fill
                         sizes="400px"
                         aria-hidden
@@ -55,8 +89,8 @@ export default function Page({ itemId }: PageProps) {
                     />
                     <div className="relative mx-auto aspect-square h-full">
                         <Image
-                            src={data.image}
-                            alt={data.name}
+                            src={menuItem.image}
+                            alt={menuItem.name}
                             fill
                             sizes="400px"
                             aria-hidden
@@ -82,47 +116,41 @@ export default function Page({ itemId }: PageProps) {
                     </div>
                 </header>
                 <main className="flex flex-grow flex-col p-6">
-                    <header className="flex flex-col gap-2 text-2xl">
+                    <header className="flex gap-2 text-2xl">
                         <h1 className="line-clamp-3 flex-grow flex-wrap font-semibold">
-                            {data.name}
+                            {menuItem.name}
                         </h1>
-                        <p>{currencyFormatter.format(data.unitaryPrice)}</p>
+                        <p>{currencyFormatter.format(menuItem.unitaryPrice)}</p>
                     </header>
                     <section aria-label="description" className="mt-4">
                         <p className="text-base">
-                            {data.description ||
+                            {menuItem.description ||
                                 "Lorem ipsum dolor sit amet consectetur. Facilisi pretium gravida amet duis pellentesque ut morbi."}
                         </p>
                     </section>
                     <section className="mt-auto">
-                        <OrderNote />
+                        <OrderNote value={note} onChange={onNoteChange} />
                     </section>
                 </main>
             </div>
             <BottomAppBar>
                 <div className="flex h-full flex-shrink items-center gap-2">
-                    <Button
-                        onClick={() => changeQuantity("subtract")}
-                        className="h-12 w-12 text-black"
-                        disabled={quantity === 1}
-                    >
-                        <IconMinus />
-                    </Button>
-                    <span className="font-medium">{quantity}</span>
-                    <Button
-                        onClick={() => changeQuantity("add")}
-                        className="h-12 w-12 text-black"
-                    >
-                        <IconPlus />
-                    </Button>
+                    <QuantityCounter
+                        onChange={onQuantityChange}
+                        quantity={quantity}
+                    />
                 </div>
                 <BottomAppBarPrimaryAction className="flex flex-grow items-center">
                     <Button
                         variant="filled"
                         className="flex-grow rounded-full py-3"
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                        onClick={onAddToCartClick}
                     >
                         Add{" "}
-                        {currencyFormatter.format(quantity * data.unitaryPrice)}
+                        {currencyFormatter.format(
+                            quantity * menuItem.unitaryPrice,
+                        )}
                     </Button>
                 </BottomAppBarPrimaryAction>
             </BottomAppBar>
@@ -168,7 +196,13 @@ export async function getServerSideProps({
     };
 }
 
-function OrderNote() {
+function OrderNote({
+    value,
+    onChange,
+}: {
+    value: string | undefined;
+    onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
+}) {
     return (
         <fieldset>
             <label htmlFor="order-note" className="sr-only">
@@ -179,6 +213,8 @@ function OrderNote() {
                 placeholder="Please don't put this or that..."
                 className="form-textarea w-full rounded ring-action"
                 maxLength={255}
+                value={value}
+                onChange={onChange}
             ></textarea>
         </fieldset>
     );

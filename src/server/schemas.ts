@@ -64,18 +64,49 @@ export const orderItemSchema = z
         itemId: z.string().cuid(),
         item: menuItemSchema,
         itemQuantity: z.number().positive(),
+        note: z.string().optional().nullable(),
     })
     .extend(baseSchema.shape);
+export type OrderItem = z.infer<typeof orderItemSchema>;
+export const orderItemCreationSchema = orderItemSchema
+    .pick({
+        itemId: true,
+        itemQuantity: true,
+        note: true,
+    })
+    .merge(
+        z.object({
+            item: menuItemSchema.pick({
+                name: true,
+                description: true,
+                unitaryPrice: true,
+                image: true,
+            }),
+        }),
+    );
+export type OrderItemCreationData = z.infer<typeof orderItemCreationSchema>;
 
 export const orderSchema = z
     .object({
         completedAt: z.date().nullable(),
-        canceled: z.boolean(),
         customerId: z.string(),
         items: orderItemSchema.array(),
+        status: z.enum([
+            "created",
+            "pendingApproval",
+            "preparing",
+            "ready",
+            "served",
+            "canceled",
+        ]),
     })
     .extend(baseSchema.shape);
 export type Order = z.infer<typeof orderSchema>;
+
+export const orderCreationSchema = orderSchema
+    .pick({ customerId: true })
+    .merge(z.object({ items: orderItemCreationSchema.array() }));
+export type OrderCreation = z.infer<typeof orderCreationSchema>;
 
 const orderHistoryItemSchema = orderItemSchema
     .pick({ itemId: true, itemQuantity: true })

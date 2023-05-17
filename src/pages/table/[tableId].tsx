@@ -5,6 +5,7 @@ import type {
     InferGetServerSidePropsType,
 } from "next";
 import Link from "next/link";
+import React from "react";
 import superjson from "superjson";
 import { Button } from "y/components/button";
 import {
@@ -23,6 +24,7 @@ import { createInnerTRPCContext } from "y/server/api/trpc";
 import { getServerAuthSession } from "y/server/auth";
 import { api } from "y/utils/api";
 import { currencyFormatter, formatTableSessionOpenTime } from "y/utils/locale";
+import { useSetCustomers, useSetOrderCreationCustomer } from "y/utils/state";
 
 export async function getServerSideProps({
     req,
@@ -56,8 +58,17 @@ function Page({
     const { data } = api.table.getTableSession.useQuery(tableId, {
         refetchOnWindowFocus: false,
     });
+    const setCustomers = useSetCustomers();
+    const setOrderCreationCustomerAtom = useSetOrderCreationCustomer();
+
+    const onCustomerClick = (customerId: string) => {
+        setOrderCreationCustomerAtom(customerId);
+    };
 
     if (!data) return <></>;
+
+    setCustomers(data.customers);
+
     return (
         <>
             <TopAppBar showPreviousButton />
@@ -84,15 +95,20 @@ function Page({
                             Customers
                         </SectionHeader>
                         <SectionBody role="list">
-                            {data.customers.map(x => {
+                            {data.customers.map((x) => {
                                 return (
                                     <Link
                                         key={x.id}
-                                        href={`/menu/?userId=${x.id}&tableId=${tableId}`}
+                                        href={`/menu/?customerId=${x.id}`}
                                         passHref
                                         legacyBehavior
                                     >
-                                        <ListItem className="bg-white">
+                                        <ListItem
+                                            className="bg-white"
+                                            onClick={() =>
+                                                onCustomerClick(x.id)
+                                            }
+                                        >
                                             <ListItemLeading>
                                                 <ListItemImage
                                                     alt={x.name}
@@ -116,11 +132,10 @@ function Page({
                     <Section>
                         <SectionHeader className="px-5">Orders</SectionHeader>
                         <SectionBody role="list">
-                            {data.orderHistory.map(x => {
+                            {data.orderHistory.map((x) => {
                                 const customer = data.customers.find(
-                                    customer => customer.id === x.customerId,
+                                    (customer) => customer.id === x.customerId,
                                 );
-
                                 return (
                                     <ListItem key={x.id} className="bg-white">
                                         <ListItemLeading>
@@ -139,7 +154,7 @@ function Page({
                                                         "flex flex-col text-sm",
                                                 )}
                                             >
-                                                {x.items.map(item => {
+                                                {x.items.map((item) => {
                                                     return (
                                                         <span key={item.itemId}>
                                                             {item.itemQuantity

@@ -2,7 +2,7 @@
 const config = {
     plugins: [require.resolve("prettier-plugin-tailwindcss")],
     tabWidth: 4,
-    arrowParens: "avoid",
+    arrowParens: "always",
     trailingComma: "all",
 };
 

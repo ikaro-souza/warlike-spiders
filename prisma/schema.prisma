@@ -226,7 +226,7 @@ model Order {
     createdAt   DateTime             @default(now())
     updatedAt   DateTime             @updatedAt
     completedAt DateTime?
-    canceled    Boolean              @default(false)
+    status      OrderStatus          @default(created)
     customerId  String
     customer    TableSessionCustomer @relation(fields: [customerId], references: [id], onDelete: Cascade)
     items       OrderItem[]
@@ -241,6 +241,7 @@ model OrderItem {
     itemQuantity Int      @db.UnsignedTinyInt
     orderId      String
     order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    note         String?  @db.VarChar(255)
 
     @@index([itemId])
     @@index([orderId])
@@ -261,4 +262,13 @@ enum TableSessionStatus {
     ordering
     waiting_order
     closed
+}
+
+enum OrderStatus {
+    created
+    pendingApproval
+    preparing
+    ready
+    served
+    canceled
 }

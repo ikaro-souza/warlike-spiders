@@ -4,10 +4,12 @@ import React from "react";
 
 type TopAppBarProps = {
     showPreviousButton?: boolean;
+    title?: string;
 };
 
 export const TopAppBar: React.FunctionComponent<TopAppBarProps> = ({
     showPreviousButton,
+    title,
 }) => {
     const router = useRouter();
 
@@ -19,7 +21,7 @@ export const TopAppBar: React.FunctionComponent<TopAppBarProps> = ({
                 </div>
             )}
             <h1 className="flex-1 text-center text-xs font-medium uppercase leading-snug">
-                restaurant&apos;s name
+                {title ?? "restaurant's name"}
             </h1>
         </header>
     );

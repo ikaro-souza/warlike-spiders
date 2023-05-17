@@ -1,6 +1,9 @@
 import { createProxySSGHelpers } from "@trpc/react-query/ssg";
 import clsx from "clsx";
-import type { GetServerSidePropsContext } from "next";
+import type {
+    GetServerSidePropsContext,
+    InferGetServerSidePropsType,
+} from "next";
 import Link from "next/link";
 import superjson from "superjson";
 import {
@@ -26,38 +29,24 @@ import { createInnerTRPCContext } from "y/server/api/trpc";
 import { getServerAuthSession } from "y/server/auth";
 import { api } from "y/utils/api";
 import { currencyFormatter } from "y/utils/locale";
+import { useOrderCreation } from "y/utils/state";
 
-export async function getServerSideProps({
-    req,
-    res,
-}: GetServerSidePropsContext) {
-    const session = await getServerAuthSession({ req, res });
-    const ssg = createProxySSGHelpers({
-        router: appRouter,
-        ctx: createInnerTRPCContext({ session }),
-        transformer: superjson,
-    });
-    await ssg.menu.getMenu.prefetch();
-
-    return {
-        props: {
-            trpcState: ssg.dehydrate(),
-        },
-    };
-}
-
-function Page() {
-    const { data } = api.menu.getMenu.useQuery(undefined, {
-        staleTime: 600,
+function Page({
+    customerId,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const { data: menu } = api.menu.getMenu.useQuery(undefined, {
+        staleTime: 360,
         refetchOnWindowFocus: false,
     });
-    if (!data) return <></>;
+    const [orderCreationData, setOrderCreationData] = useOrderCreation();
+
+    if (!menu) return <></>;
 
     return (
         <>
             <TopAppBar showPreviousButton />
             <main>
-                {data.sections.map(x => (
+                {menu.sections.map((x) => (
                     <Section key={x.id} className="py-5">
                         <SectionHeader className="px-5">{x.name}</SectionHeader>
                         <SectionBody
@@ -67,7 +56,7 @@ function Page() {
                             )}
                             role="list"
                         >
-                            {x.items.map(y => {
+                            {x.items.map((y) => {
                                 const href = `/menu/item/${y.id}`;
 
                                 if (x.highlight)
@@ -131,3 +120,26 @@ function Page() {
 }
 
 export default Page;
+
+export async function getServerSideProps({
+    req,
+    res,
+    query,
+}: GetServerSidePropsContext) {
+    const session = await getServerAuthSession({ req, res });
+    const ssg = createProxySSGHelpers({
+        router: appRouter,
+        ctx: createInnerTRPCContext({ session }),
+        transformer: superjson,
+    });
+    await ssg.menu.getMenu.prefetch();
+
+    const customerId = query.customerId as string | undefined;
+
+    return {
+        props: {
+            trpcState: ssg.dehydrate(),
+            customerId,
+        },
+    };
+}
