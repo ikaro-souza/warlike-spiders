@@ -1,4 +1,5 @@
-import { IconCircleMinus, IconUserCircle } from "@tabler/icons-react";
+import { IconCircleX, IconUserCircle } from "@tabler/icons-react";
+import { useRouter } from "next/router";
 import React from "react";
 import {
     BottomAppBar,
@@ -28,6 +29,7 @@ import { TopAppBar } from "y/components/top-app-bar";
 import { type OrderItemCreationData } from "y/server/schemas";
 import { currencyFormatter } from "y/utils/locale";
 import {
+    useClearOrder,
     useCustomers,
     useOrderCreationValue,
     useRemoveItemFromOrder,
@@ -36,6 +38,8 @@ import {
 
 function Page() {
     const order = useOrderCreationValue();
+    const clearOrder = useClearOrder();
+    const router = useRouter();
     const totalOrdered = React.useMemo(() => {
         if (!order) return 0;
         return order.items.reduce(
@@ -44,6 +48,16 @@ function Page() {
             0,
         );
     }, [order]);
+
+    const onConfirmClick = () => {
+        clearOrder();
+        router.back();
+    };
+
+    const onClearOrderClick = () => {
+        clearOrder();
+        router.back();
+    };
 
     if (!order) {
         return (
@@ -87,8 +101,9 @@ function Page() {
                         <Button
                             variant="icon"
                             className="h-full w-full text-black"
+                            onClick={onClearOrderClick}
                         >
-                            <IconCircleMinus />
+                            <IconCircleX />
                         </Button>
                     </BottomAppBarAction>
                     <BottomAppBarAction>
@@ -104,6 +119,7 @@ function Page() {
                     <Button
                         variant="filled"
                         className="flex-grow rounded-full py-3"
+                        onClick={onConfirmClick}
                     >
                         Confirm
                     </Button>

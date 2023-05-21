@@ -7,14 +7,12 @@ export const orderRouter = createTRPCRouter({
     createOrder: publicProcedure
         .input(orderCreationSchema)
         .mutation(async ({ input, ctx }) => {
+            if (!input.customerId) throw new TRPCError({ code: "BAD_REQUEST" });
+
             return await ctx.prisma.order.create({
                 data: {
                     customerId: input.customerId,
-                    items: {
-                        createMany: {
-                            data: input.items,
-                        },
-                    },
+                    items: { createMany: { data: input.items } },
                 },
             });
         }),

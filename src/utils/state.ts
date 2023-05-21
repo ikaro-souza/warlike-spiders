@@ -6,7 +6,10 @@ import type {
     TableSessionCustomer,
 } from "y/server/schemas";
 
-const customersAtom = atom<Array<TableSessionCustomer>>([]);
+const customersAtom = atomWithStorage<Array<TableSessionCustomer>>(
+    "customers",
+    [],
+);
 export const useCustomers = () => useAtomValue(customersAtom);
 
 const setCustomersAtom = atom(
@@ -90,3 +93,8 @@ const removeItemFromOrderAtom = atom(null, (_, set, itemId: string) => {
     });
 });
 export const useRemoveItemFromOrder = () => useSetAtom(removeItemFromOrderAtom);
+
+const clearOrderAtom = atom(null, (_, set) => {
+    set(orderCreationAtom, undefined);
+});
+export const useClearOrder = () => useSetAtom(clearOrderAtom);
