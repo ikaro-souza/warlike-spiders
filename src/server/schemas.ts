@@ -50,6 +50,12 @@ export const menuItemSchema = z
     .extend(baseSchema.shape);
 export type MenuItem = z.infer<typeof menuItemSchema>;
 
+export const menuItemCreationSchema = menuItemSchema.pick({
+    name: true,
+    unitaryPrice: true,
+    image: true,
+});
+
 export const menuSectionSchema = z
     .object({
         name: z.string().max(50),
@@ -74,16 +80,7 @@ export const orderItemCreationSchema = orderItemSchema
         itemQuantity: true,
         note: true,
     })
-    .merge(
-        z.object({
-            item: menuItemSchema.pick({
-                name: true,
-                description: true,
-                unitaryPrice: true,
-                image: true,
-            }),
-        }),
-    );
+    .merge(z.object({ item: menuItemCreationSchema }));
 export type OrderItemCreationData = z.infer<typeof orderItemCreationSchema>;
 
 export const orderSchema = z
@@ -103,8 +100,10 @@ export const orderSchema = z
     .extend(baseSchema.shape);
 export type Order = z.infer<typeof orderSchema>;
 
-export const orderCreationSchema = orderSchema
-    .pick({ customerId: true })
+export const orderCreationSchema = z
+    .object({
+        customerId: z.string().cuid().optional(),
+    })
     .merge(z.object({ items: orderItemCreationSchema.array() }));
 export type OrderCreation = z.infer<typeof orderCreationSchema>;
 

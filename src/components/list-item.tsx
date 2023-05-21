@@ -2,10 +2,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import React from "react";
 
-type ListItemProps = Omit<
-    React.HTMLAttributes<HTMLDivElement>,
-    "children" | "role"
->;
+type ListItemProps = React.HTMLAttributes<HTMLDivElement>;
 export const ListItem = React.forwardRef<
     HTMLDivElement,
     React.PropsWithChildren<ListItemProps>

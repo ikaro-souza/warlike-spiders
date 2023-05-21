@@ -6,13 +6,16 @@ import type {
     TableSessionCustomer,
 } from "y/server/schemas";
 
-const customersAtom = atom<TableSessionCustomer[]>([]);
-export const useCustomers = () => useAtom(customersAtom);
+const customersAtom = atom<Array<TableSessionCustomer>>([]);
+export const useCustomers = () => useAtomValue(customersAtom);
 
-export const useSetCustomers = () => {
-    const set = useSetAtom(customersAtom);
-    return (customers: TableSessionCustomer[]) => set(customers);
-};
+const setCustomersAtom = atom(
+    null,
+    (_, set, customers: TableSessionCustomer[]) => {
+        set(customersAtom, customers);
+    },
+);
+export const useSetCustomers = () => useSetAtom(setCustomersAtom);
 
 const orderCreationAtom = atomWithStorage<OrderCreation | undefined>(
     "orderCreationData",
@@ -48,28 +51,31 @@ const setOrderCreationCustomerAtom = atom(
 export const useSetOrderCreationCustomer = () =>
     useSetAtom(setOrderCreationCustomerAtom);
 
-const addItemToOrderAtom = atom(null, (_, set, item: OrderItemCreationData) => {
-    set(orderCreationAtom, (order) => {
-        if (!order) return;
-        if (!order.items.some((i) => i.itemId === item.itemId))
-            order.items.push(item);
+const addItemToOrderAtom = atom(
+    null,
+    (_, set, orderItem: OrderItemCreationData) => {
+        set(orderCreationAtom, (order) => {
+            if (!order) return;
+            if (!order.items.some((x) => x.itemId === orderItem.itemId))
+                order.items.push(orderItem);
 
-        return order;
-    });
-});
+            return order;
+        });
+    },
+);
 export const useAddItemToOrder = () => useSetAtom(addItemToOrderAtom);
 
 const updateItemInOrderAtom = atom(
     null,
-    (_, set, item: OrderItemCreationData) => {
+    (_, set, orderItem: OrderItemCreationData) => {
         set(orderCreationAtom, (order) => {
             if (!order) return;
             const itemIndex = order.items.findIndex(
-                (x) => x.itemId === item.itemId,
+                (x) => x.itemId === orderItem.itemId,
             );
             if (itemIndex === -1) return order;
 
-            order.items[itemIndex] = item;
+            order.items[itemIndex] = orderItem;
             return { ...order };
         });
     },
@@ -79,7 +85,7 @@ export const useUpdateItemInOrder = () => useSetAtom(updateItemInOrderAtom);
 const removeItemFromOrderAtom = atom(null, (_, set, itemId: string) => {
     set(orderCreationAtom, (order) => {
         if (!order) return;
-        order.items = order.items.filter((i) => i.itemId !== itemId);
+        order.items = order.items.filter((x) => x.itemId !== itemId);
         return { ...order };
     });
 });

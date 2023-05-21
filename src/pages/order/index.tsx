@@ -1,17 +1,34 @@
+import { IconCircleMinus, IconUserCircle } from "@tabler/icons-react";
+import React from "react";
+import {
+    BottomAppBar,
+    BottomAppBarAction,
+    BottomAppBarActions,
+    BottomAppBarPrimaryAction,
+} from "y/components/bottom-app-bar";
+import { Button } from "y/components/button";
 import {
     ListItem,
     ListItemContent,
     ListItemHeadline,
     ListItemImage,
+    ListItemLeading,
+    ListItemOverline,
     ListItemSupportingText,
     ListItemTrailing,
 } from "y/components/list-item";
 import { QuantityCounter } from "y/components/quanitity-counter";
-import { Section, SectionBody } from "y/components/section";
+import {
+    Section,
+    SectionBody,
+    SectionFooter,
+    SectionHeader,
+} from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
 import { type OrderItemCreationData } from "y/server/schemas";
 import { currencyFormatter } from "y/utils/locale";
 import {
+    useCustomers,
     useOrderCreationValue,
     useRemoveItemFromOrder,
     useUpdateItemInOrder,
@@ -19,6 +36,14 @@ import {
 
 function Page() {
     const order = useOrderCreationValue();
+    const totalOrdered = React.useMemo(() => {
+        if (!order) return 0;
+        return order.items.reduce(
+            (acc, orderItem) =>
+                acc + orderItem.itemQuantity * orderItem.item.unitaryPrice,
+            0,
+        );
+    }, [order]);
 
     if (!order) {
         return (
@@ -33,14 +58,57 @@ function Page() {
         <>
             <TopAppBar title={"Table's 08 order"} showPreviousButton />
             <main className="flex flex-col gap-4 pt-5">
-                <Section>
+                <Section className="bg-white">
+                    <SectionHeader className="sr-only">
+                        order items
+                    </SectionHeader>
                     <SectionBody role="list">
-                        {order.items.map((item) => (
-                            <OrderItem key={item.itemId} orderItem={item} />
+                        {order.items.map((orderItem) => (
+                            <OrderItem
+                                key={orderItem.itemId}
+                                orderItem={orderItem}
+                            />
                         ))}
                     </SectionBody>
+                    <SectionFooter className="-mt-4 px-5 py-3">
+                        <p className="text-xl font-medium">
+                            Total: {currencyFormatter.format(totalOrdered)}
+                        </p>
+                    </SectionFooter>
+                </Section>
+                <Section className="bg-white">
+                    <SectionHeader className="sr-only">customer</SectionHeader>
+                    <SelectedCustomer customerId={order.customerId} />
                 </Section>
             </main>
+            <BottomAppBar>
+                <BottomAppBarActions shrink>
+                    <BottomAppBarAction>
+                        <Button
+                            variant="icon"
+                            className="h-full w-full text-black"
+                        >
+                            <IconCircleMinus />
+                        </Button>
+                    </BottomAppBarAction>
+                    <BottomAppBarAction>
+                        <Button
+                            variant="icon"
+                            className="h-full w-full text-black"
+                        >
+                            <IconUserCircle />
+                        </Button>
+                    </BottomAppBarAction>
+                </BottomAppBarActions>
+                <BottomAppBarPrimaryAction className="flex flex-grow items-center">
+                    <Button
+                        variant="filled"
+                        className="flex-grow rounded-full py-3"
+                    >
+                        Confirm
+                    </Button>
+                </BottomAppBarPrimaryAction>
+            </BottomAppBar>
         </>
     );
 }
@@ -63,7 +131,7 @@ function OrderItem({ orderItem }: { orderItem: OrderItemCreationData }) {
     };
 
     return (
-        <ListItem className="bg-white">
+        <ListItem>
             <ListItemContent>
                 <ListItemHeadline className="font-medium">
                     {name}
@@ -85,10 +153,51 @@ function OrderItem({ orderItem }: { orderItem: OrderItemCreationData }) {
                 <ListItemImage
                     url={image}
                     alt={name}
-                    className="rounded-lg"
+                    className="h-16 w-16 rounded-lg"
                     priority
                 />
             </ListItemTrailing>
+        </ListItem>
+    );
+}
+
+type SelectedCustomerProps = { customerId: string | undefined };
+function SelectedCustomer({ customerId }: SelectedCustomerProps) {
+    const customers = useCustomers();
+    const customer = React.useMemo(
+        () => customers.find((c) => c.id === customerId),
+        [customers, customerId],
+    );
+
+    return (
+        <ListItem role="button">
+            {customer ? (
+                <>
+                    <ListItemLeading>
+                        <ListItemImage
+                            alt={customer.name}
+                            url={customer.image}
+                        />
+                    </ListItemLeading>
+                    <ListItemContent>
+                        <ListItemOverline className="opacity-50">
+                            Ordering for
+                        </ListItemOverline>
+                        <ListItemHeadline>{customer.name}</ListItemHeadline>
+                    </ListItemContent>
+                </>
+            ) : (
+                <>
+                    <ListItemContent>
+                        <ListItemHeadline>
+                            Who is this order for?
+                        </ListItemHeadline>
+                    </ListItemContent>
+                </>
+            )}
+            <ListItemLeading className="flex items-center">
+                <Button>{customer ? "Change" : "Choose"}</Button>
+            </ListItemLeading>
         </ListItem>
     );
 }

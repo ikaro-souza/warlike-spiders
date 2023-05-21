@@ -18,6 +18,7 @@ import { QuantityCounter } from "y/components/quanitity-counter";
 import { appRouter } from "y/server/api/root";
 import { createInnerTRPCContext } from "y/server/api/trpc";
 import { getServerAuthSession } from "y/server/auth";
+import { menuItemCreationSchema } from "y/server/schemas";
 import { api } from "y/utils/api";
 import { currencyFormatter } from "y/utils/locale";
 import {
@@ -39,7 +40,7 @@ export default function Page({ itemId }: PageProps) {
     React.useLayoutEffect(() => {
         if (!menuItem) return;
 
-        const item = orderCreationData?.items.find((i) => i.itemId === itemId);
+        const item = orderCreationData?.items.find((x) => x.itemId === itemId);
         if (!item) return;
 
         setQuantity(item.itemQuantity);
@@ -50,9 +51,8 @@ export default function Page({ itemId }: PageProps) {
     if (!menuItem) return <></>;
 
     const onAddToCartClick = async () => {
-        // TODO: test this out
         const orderItem = {
-            item: menuItem,
+            item: menuItemCreationSchema.parse(menuItem),
             itemId: menuItem.id,
             itemQuantity: quantity,
             note,
@@ -62,7 +62,8 @@ export default function Page({ itemId }: PageProps) {
         } else {
             addItemToOrder(orderItem);
         }
-        await router.push("/order");
+
+        await router.replace("/order");
     };
 
     const onQuantityChange = (q: number): void => setQuantity(q);

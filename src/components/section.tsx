@@ -50,9 +50,19 @@ export const SectionHeader: React.FC<
 };
 
 type SectionBodyProps = React.HTMLAttributes<HTMLDivElement>;
-
 export const SectionBody: React.FC<
     React.PropsWithChildren<SectionBodyProps>
 > = ({ children, ...props }) => {
     return <section {...props}>{children}</section>;
+};
+
+type SectionFooterProps = React.HTMLAttributes<HTMLDivElement>;
+export const SectionFooter: React.FC<
+    React.PropsWithChildren<SectionFooterProps>
+> = ({ children, ...props }) => {
+    return (
+        <footer className={clsx("px-5 py-3")} {...props}>
+            {children}
+        </footer>
+    );
 };
