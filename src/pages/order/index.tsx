@@ -1,5 +1,4 @@
 import { IconCircleX, IconUserCircle } from "@tabler/icons-react";
-import { useRouter } from "next/router";
 import React from "react";
 import {
     BottomAppBar,
@@ -26,6 +25,7 @@ import {
     SectionHeader,
 } from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
+import { useRouter } from "y/lib/router";
 import { type OrderItemCreationData } from "y/server/schemas";
 import { currencyFormatter } from "y/utils/locale";
 import {
@@ -51,12 +51,12 @@ function Page() {
 
     const onConfirmClick = () => {
         clearOrder();
-        router.back();
+        router.go(-2);
     };
 
     const onClearOrderClick = () => {
         clearOrder();
-        router.back();
+        router.go(-2);
     };
 
     if (!order) {
