@@ -1,23 +1,34 @@
 import clsx from "clsx";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
-type ListItemProps = React.HTMLAttributes<HTMLDivElement>;
+type ListItemProps = React.HTMLAttributes<HTMLDivElement> & {
+    href?: string;
+};
 export const ListItem = React.forwardRef<
     HTMLDivElement,
     React.PropsWithChildren<ListItemProps>
->(({ children, className, ...props }, ref) => {
+>(({ children, className: classNameProp, href, ...props }, ref) => {
+    const className = clsx(
+        "flex w-full gap-3 px-5 py-3 text-black ",
+        classNameProp,
+    );
+
     return (
         <div
             ref={ref}
             role="listitem"
-            className={clsx(
-                "flex w-full gap-3 px-5 py-3 text-black",
-                className,
-            )}
+            className={href ? undefined : className}
             {...props}
         >
-            {children}
+            {href ? (
+                <Link href={href} className={className}>
+                    {children}
+                </Link>
+            ) : (
+                children
+            )}
         </div>
     );
 });

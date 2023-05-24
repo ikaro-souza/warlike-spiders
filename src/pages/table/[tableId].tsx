@@ -4,7 +4,6 @@ import type {
     GetServerSidePropsContext,
     InferGetServerSidePropsType,
 } from "next";
-import Link from "next/link";
 import React from "react";
 import superjson from "superjson";
 import { Button } from "y/components/button";
@@ -97,34 +96,27 @@ function Page({
                         <SectionBody role="list">
                             {data.customers.map((x) => {
                                 return (
-                                    <Link
+                                    <ListItem
                                         key={x.id}
+                                        className="bg-white"
                                         href={`/menu/?customerId=${x.id}`}
-                                        passHref
-                                        legacyBehavior
+                                        onClick={() => onCustomerClick(x.id)}
                                     >
-                                        <ListItem
-                                            className="bg-white"
-                                            onClick={() =>
-                                                onCustomerClick(x.id)
-                                            }
-                                        >
-                                            <ListItemLeading>
-                                                <ListItemImage
-                                                    alt={x.name}
-                                                    url={x.image}
-                                                />
-                                            </ListItemLeading>
-                                            <ListItemContent>
-                                                <ListItemHeadline>
-                                                    {x.name}
-                                                </ListItemHeadline>
-                                            </ListItemContent>
-                                            <ListItemTrailing className="flex items-center">
-                                                <Button>Serve</Button>
-                                            </ListItemTrailing>
-                                        </ListItem>
-                                    </Link>
+                                        <ListItemLeading>
+                                            <ListItemImage
+                                                alt={x.name}
+                                                url={x.image}
+                                            />
+                                        </ListItemLeading>
+                                        <ListItemContent>
+                                            <ListItemHeadline>
+                                                {x.name}
+                                            </ListItemHeadline>
+                                        </ListItemContent>
+                                        <ListItemTrailing className="flex items-center">
+                                            <Button>Serve</Button>
+                                        </ListItemTrailing>
+                                    </ListItem>
                                 );
                             })}
                         </SectionBody>
