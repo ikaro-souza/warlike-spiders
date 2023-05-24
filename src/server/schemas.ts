@@ -107,7 +107,7 @@ export const orderCreationSchema = z
     .merge(z.object({ items: orderItemCreationSchema.array() }));
 export type OrderCreation = z.infer<typeof orderCreationSchema>;
 
-const orderHistoryItemSchema = orderItemSchema
+export const orderHistoryItemSchema = orderItemSchema
     .pick({ itemId: true, itemQuantity: true })
     .merge(
         menuItemSchema.pick({
@@ -119,9 +119,9 @@ const orderHistoryItemSchema = orderItemSchema
     );
 export type OrderHistoryItem = z.infer<typeof orderHistoryItemSchema>;
 
-export const orderHistorySchema = orderSchema
-    .pick({ id: true, customerId: true })
-    .merge(z.object({ items: orderHistoryItemSchema.array().nonempty() }))
+export const orderHistorySchema = z
+    .object({ items: orderHistoryItemSchema.array() })
+    .merge(orderSchema.pick({ id: true, customerId: true }))
     .array();
 export type OrderHistory = z.infer<typeof orderHistorySchema>;
 

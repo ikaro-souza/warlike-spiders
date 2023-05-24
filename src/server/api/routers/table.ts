@@ -5,7 +5,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { DateTime } from "luxon";
 import { createTRPCRouter, publicProcedure } from "y/server/api/trpc";
 import {
-    orderHistorySchema,
+    OrderHistory,
     orderSchema,
     tableSessionCustomerSchema,
     tableSessionSchema,
@@ -98,7 +98,6 @@ export const tableRouter = createTRPCRouter({
 
             const customers: TableSessionCustomer[] = [];
             const orders: Order[] = [];
-            const items: OrderHistoryItem[] = [];
 
             for (
                 let index = 0;
@@ -124,9 +123,12 @@ export const tableRouter = createTRPCRouter({
                 }
             }
 
+            const orderHistory: OrderHistory = [];
             orders.forEach((order) => {
-                items.push(
-                    ...order.items.map<OrderHistoryItem>((orderItem) => {
+                orderHistory.push({
+                    id: order.id,
+                    customerId: order.customerId,
+                    items: order.items.map<OrderHistoryItem>((orderItem) => {
                         return {
                             description: orderItem.item.description,
                             image: orderItem.item.image,
@@ -136,7 +138,7 @@ export const tableRouter = createTRPCRouter({
                             unitaryPrice: orderItem.item.unitaryPrice,
                         };
                     }),
-                );
+                });
             });
 
             let totalOrdered = 0;
@@ -154,9 +156,7 @@ export const tableRouter = createTRPCRouter({
             return {
                 customers: customers,
                 id: tableSession.id,
-                orderHistory: orderHistorySchema.parse(
-                    orders.map((order) => ({ ...order, items })),
-                ),
+                orderHistory,
                 totalOrdered,
                 createdAt: DateTime.now().minus({ minutes: 48 }).toJSDate(),
                 updatedAt: tableSession.updatedAt,

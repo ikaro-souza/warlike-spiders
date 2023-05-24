@@ -27,6 +27,7 @@ import {
 import { TopAppBar } from "y/components/top-app-bar";
 import { useRouter } from "y/lib/router";
 import { type OrderItemCreationData } from "y/server/schemas";
+import { api } from "y/utils/api";
 import { currencyFormatter } from "y/utils/locale";
 import {
     useClearOrder,
@@ -40,6 +41,17 @@ function Page() {
     const order = useOrderCreationValue();
     const clearOrder = useClearOrder();
     const router = useRouter();
+    const {
+        mutate: createOrder,
+        isLoading,
+        isSuccess,
+    } = api.order.createOrder.useMutation({
+        onSuccess: () => {
+            clearOrder();
+            router.go(-2);
+        },
+    });
+
     const totalOrdered = React.useMemo(() => {
         if (!order) return 0;
         return order.items.reduce(
@@ -50,8 +62,8 @@ function Page() {
     }, [order]);
 
     const onConfirmClick = () => {
-        clearOrder();
-        router.go(-2);
+        if (!order) return;
+        createOrder(order);
     };
 
     const onClearOrderClick = () => {
@@ -120,6 +132,7 @@ function Page() {
                         variant="filled"
                         className="flex-grow rounded-full py-3"
                         onClick={onConfirmClick}
+                        disabled={isLoading || isSuccess}
                     >
                         Confirm
                     </Button>

@@ -1,5 +1,9 @@
 import { TRPCError } from "@trpc/server";
-import { orderCreationSchema, orderSchema } from "y/server/schemas";
+import {
+    orderCreationSchema,
+    orderItemCreationSchema,
+    orderSchema,
+} from "y/server/schemas";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
@@ -12,7 +16,13 @@ export const orderRouter = createTRPCRouter({
             return await ctx.prisma.order.create({
                 data: {
                     customerId: input.customerId,
-                    items: { createMany: { data: input.items } },
+                    items: {
+                        createMany: {
+                            data: orderItemCreateManyDataSchema.parse(
+                                input.items,
+                            ),
+                        },
+                    },
                 },
             });
         }),
@@ -30,3 +40,7 @@ export const orderRouter = createTRPCRouter({
             return orderSchema.parse(order);
         }),
 });
+
+const orderItemCreateManyDataSchema = orderItemCreationSchema
+    .omit({ item: true })
+    .array();
