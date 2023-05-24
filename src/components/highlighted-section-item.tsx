@@ -8,20 +8,17 @@ type HighlightedSectionItemProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 export const HighlightedSectionItem: React.FC<
     React.PropsWithChildren<HighlightedSectionItemProps>
-> = ({ children, className, href, ...props }) => {
+> = ({ children, className: classNameProp, href, ...props }) => {
+    const className = clsx(
+        "block aspect-[4/5] w-1/2 overflow-hidden rounded-xl bg-white",
+        classNameProp,
+    );
     return (
-        <Link
-            className={clsx(
-                "aspect-[4/5] w-1/2 overflow-hidden rounded-xl bg-white",
-                className,
-            )}
-            href={href}
-            passHref
-        >
-            <article className="h-full w-full" {...props}>
+        <article role="listitem" className={className} {...props}>
+            <Link href={href} className="h-full w-full">
                 {children}
-            </article>
-        </Link>
+            </Link>
+        </article>
     );
 };
 
@@ -50,6 +47,7 @@ export const HighlightedSectionItemImage: React.FC<
             fill
             className="object-cover"
             sizes="200px"
+            priority
         />
     );
 };
