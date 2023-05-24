@@ -5,12 +5,12 @@ import { createId } from "@paralleldrive/cuid2";
 import { DateTime } from "luxon";
 import { createTRPCRouter, publicProcedure } from "y/server/api/trpc";
 import {
-    OrderHistory,
     orderSchema,
     tableSessionCustomerSchema,
     tableSessionSchema,
     waiterShiftSummarySchema,
     type Order,
+    type OrderHistory,
     type OrderHistoryItem,
     type TableSessionCustomer,
     type WaiterShiftSummaryTable,
