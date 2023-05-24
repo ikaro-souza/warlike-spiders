@@ -4,7 +4,6 @@ import type {
     GetServerSidePropsContext,
     InferGetServerSidePropsType,
 } from "next";
-import Link from "next/link";
 import superjson from "superjson";
 import {
     HighlightedSectionItem,
@@ -46,69 +45,71 @@ function Page({
         <>
             <TopAppBar showPreviousButton />
             <main>
-                {menu.sections.map((x) => (
-                    <Section key={x.id} className="py-5">
-                        <SectionHeader className="px-5">{x.name}</SectionHeader>
+                {menu.sections.map((section) => (
+                    <Section key={section.id} className="py-5">
+                        <SectionHeader className="px-5">
+                            {section.name}
+                        </SectionHeader>
                         <SectionBody
                             className={clsx(
-                                x.highlight &&
+                                section.highlight &&
                                     "scroll flex w-screen flex-row gap-4 overflow-x-scroll px-5 scrollbar-hide",
                             )}
                             role="list"
                         >
-                            {x.items.map((y) => {
-                                const href = `/menu/item/${y.id}`;
+                            {section.items.map((sectionItem) => {
+                                const href = `/menu/item/${sectionItem.id}`;
 
-                                if (x.highlight)
+                                if (section.highlight)
                                     return (
                                         <HighlightedSectionItem
                                             className="flex-shrink-0"
                                             href={href}
-                                            key={y.id}
+                                            key={sectionItem.id}
                                         >
                                             <HighlightedSectionItemHeader
-                                                title={y.name}
+                                                title={sectionItem.name}
                                             >
                                                 <HighlightedSectionItemImage
-                                                    alt={y.name}
-                                                    src={y.image}
+                                                    alt={sectionItem.name}
+                                                    src={sectionItem.image}
                                                 />
                                             </HighlightedSectionItemHeader>
                                             <HighlightedSectionItemContent>
                                                 <HighlightedSectionItemTitle>
                                                     {currencyFormatter.format(
-                                                        y.unitaryPrice,
+                                                        sectionItem.unitaryPrice,
                                                     )}
                                                 </HighlightedSectionItemTitle>
                                                 <HighlightedSectionItemDescription>
-                                                    {y.name}
+                                                    {sectionItem.name}
                                                 </HighlightedSectionItemDescription>
                                             </HighlightedSectionItemContent>
                                         </HighlightedSectionItem>
                                     );
 
                                 return (
-                                    <Link key={y.id} href={href} passHref>
-                                        <ListItem>
-                                            <ListItemContent className="gap-2">
-                                                <ListItemHeadline className="text-base">
-                                                    {currencyFormatter.format(
-                                                        Number(y.unitaryPrice),
-                                                    )}
-                                                </ListItemHeadline>
-                                                <ListItemSupportingText>
-                                                    {y.name}
-                                                </ListItemSupportingText>
-                                            </ListItemContent>
-                                            <ListItemTrailing>
-                                                <ListItemImage
-                                                    className="rounded-lg"
-                                                    alt={y.name}
-                                                    url={y.image}
-                                                />
-                                            </ListItemTrailing>
-                                        </ListItem>
-                                    </Link>
+                                    <ListItem key={sectionItem.id} href={href}>
+                                        <ListItemContent className="gap-2">
+                                            <ListItemHeadline className="text-base">
+                                                {currencyFormatter.format(
+                                                    Number(
+                                                        sectionItem.unitaryPrice,
+                                                    ),
+                                                )}
+                                            </ListItemHeadline>
+                                            <ListItemSupportingText>
+                                                {sectionItem.name}
+                                            </ListItemSupportingText>
+                                        </ListItemContent>
+                                        <ListItemTrailing>
+                                            <ListItemImage
+                                                className="rounded-lg"
+                                                alt={sectionItem.name}
+                                                url={sectionItem.image}
+                                            />
+                                        </ListItemTrailing>
+                                    </ListItem>
                                 );
                             })}
                         </SectionBody>
