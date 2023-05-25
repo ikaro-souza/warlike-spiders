@@ -1,6 +1,4 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { TRPCError } from "@trpc/server";
-import { dbErrorCodes } from "y/server/db";
 import {
     menuItemSchema,
     menuSectionSchema,
@@ -76,12 +74,7 @@ export const menuRouter = createTRPCRouter({
                 });
                 return item;
             } catch (error) {
-                if (
-                    error instanceof PrismaClientKnownRequestError &&
-                    error.code === dbErrorCodes.NOT_FOUND
-                )
-                    throw new TRPCError({ code: "NOT_FOUND" });
-                throw error;
+                throw new TRPCError({ code: "NOT_FOUND" });
             }
         }),
 });
