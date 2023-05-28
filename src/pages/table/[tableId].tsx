@@ -16,7 +16,12 @@ import {
     ListItemOverline,
     ListItemTrailing,
 } from "y/components/list-item";
-import { Section, SectionBody, SectionHeader } from "y/components/section";
+import {
+    Section,
+    SectionBody,
+    SectionHeader,
+    SectionTitle,
+} from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
 import { appRouter } from "y/server/api/root";
 import { createInnerTRPCContext } from "y/server/api/trpc";
@@ -91,7 +96,7 @@ function Page({
                 <div className="flex flex-col gap-5">
                     <Section className="pt-7">
                         <SectionHeader className="px-5">
-                            Customers
+                            <SectionTitle>Customers</SectionTitle>
                         </SectionHeader>
                         <SectionBody role="list">
                             {data.customers.map((x) => {
@@ -122,7 +127,9 @@ function Page({
                         </SectionBody>
                     </Section>
                     <Section>
-                        <SectionHeader className="px-5">Orders</SectionHeader>
+                        <SectionHeader className="px-5">
+                            <SectionTitle>Orders</SectionTitle>
+                        </SectionHeader>
                         <SectionBody role="list">
                             {data.orderHistory.map((x) => {
                                 const customer = data.customers.find(

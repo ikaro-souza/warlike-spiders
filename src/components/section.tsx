@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import React from "react";
+import { Button } from "./button";
 
 type SectionProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -15,38 +16,35 @@ export const Section: React.FC<React.PropsWithChildren<SectionProps>> = ({
     );
 };
 
-type SectionHeaderProps = {
-    flexDirection?: "row" | "column";
-    title?: React.ReactNode;
-    subtitle?: React.ReactNode;
-    srRonly?: boolean;
-} & React.HTMLAttributes<HTMLDivElement>;
+type SectionHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const SectionHeader: React.FC<
     React.PropsWithChildren<SectionHeaderProps>
-> = ({ children, title, subtitle, srRonly, ...props }) => {
-    const effectiveTitle = title || children;
+> = ({ children, ...props }) => {
+    return <header {...props}>{children}</header>;
+};
+
+export const SectionTitleAndSubtitle: React.FC<React.PropsWithChildren> = ({
+    children,
+}) => {
+    return <div className="flex flex-col gap-1">{children}</div>;
+};
+
+type SectionTitleProps = { srRonly?: boolean };
+export const SectionTitle: React.FC<
+    React.PropsWithChildren<SectionTitleProps>
+> = ({ children, srRonly }) => {
     return (
-        <header
-            className={clsx(
-                "flex w-full",
-                title && subtitle ? "flex-col gap-1" : "flex-row gap-4",
-            )}
-            {...props}
-        >
-            {effectiveTitle && (
-                <h2
-                    className={clsx(
-                        "text-xl font-semibold",
-                        srRonly && "sr-only",
-                    )}
-                >
-                    {effectiveTitle}
-                </h2>
-            )}
-            {title && subtitle && <p className="text-sm">{subtitle}</p>}
-        </header>
+        <h2 className={clsx("text-xl font-semibold", srRonly && "sr-only")}>
+            {children}
+        </h2>
     );
+};
+
+export const SectionSubtitle: React.FC<React.PropsWithChildren> = ({
+    children,
+}) => {
+    return <p className="text-sm">{children}</p>;
 };
 
 type SectionBodyProps = React.HTMLAttributes<HTMLDivElement>;
@@ -64,5 +62,31 @@ export const SectionFooter: React.FC<
         <footer className={clsx("px-5 py-3")} {...props}>
             {children}
         </footer>
+    );
+};
+
+const maxListSectionItems = 5;
+type ListSectionProps = SectionProps & {
+    sectionTitle: React.ReactNode;
+    headerClassName?: string;
+};
+export const ListSection: React.FC<
+    React.PropsWithChildren<ListSectionProps>
+> = ({ children, sectionTitle, headerClassName, ...props }) => {
+    return (
+        <Section {...props}>
+            <SectionHeader
+                className={clsx(
+                    "flex items-center justify-between gap-4",
+                    headerClassName,
+                )}
+            >
+                <SectionTitle>{sectionTitle}</SectionTitle>
+                <Button>Mostrar todos</Button>
+            </SectionHeader>
+            <SectionBody role="list">
+                {React.Children.toArray(children).slice(0, maxListSectionItems)}
+            </SectionBody>
+        </Section>
     );
 };

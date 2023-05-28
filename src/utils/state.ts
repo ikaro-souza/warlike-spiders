@@ -1,4 +1,4 @@
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import type {
     OrderCreation,
@@ -24,7 +24,6 @@ const orderCreationAtom = atomWithStorage<OrderCreation | undefined>(
     "orderCreationData",
     undefined,
 );
-export const useOrderCreation = () => useAtom(orderCreationAtom);
 export const useOrderCreationValue = () => useAtomValue(orderCreationAtom);
 
 const setOrderCreationAtom = atom(

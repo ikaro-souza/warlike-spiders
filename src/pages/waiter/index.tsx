@@ -5,7 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import superjson from "superjson";
-import { Section, SectionBody, SectionHeader } from "y/components/section";
+import {
+    Section,
+    SectionBody,
+    SectionHeader,
+    SectionSubtitle,
+    SectionTitle,
+    SectionTitleAndSubtitle,
+} from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
 import { appRouter } from "y/server/api/root";
 import { createInnerTRPCContext } from "y/server/api/trpc";
@@ -54,26 +61,25 @@ function Page() {
                 </header>
                 <Summary data={data} />
                 <Section>
-                    <SectionHeader
-                        title="Tables"
-                        subtitle={
-                            <>
+                    <SectionHeader className="px-5">
+                        <SectionTitleAndSubtitle>
+                            <SectionTitle>Tables</SectionTitle>
+                            <SectionSubtitle>
                                 {data &&
                                     `You are serving ${data.servingTables.length
                                         .toString()
                                         .padStart(2, "0")} tables`}
                                 {!data && "loading"}
-                            </>
-                        }
-                        className="px-5"
-                    />
+                            </SectionSubtitle>
+                        </SectionTitleAndSubtitle>
+                    </SectionHeader>
                     <SectionBody
                         aria-label="Tables being served"
                         className="flex flex-col gap-3"
                         role="list"
                     >
                         {data &&
-                            data.servingTables.map(x => (
+                            data.servingTables.map((x) => (
                                 <TableItem key={x.number} {...x} />
                             ))}
                     </SectionBody>

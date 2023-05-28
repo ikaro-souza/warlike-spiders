@@ -32,12 +32,13 @@ export const orderRouter = createTRPCRouter({
         .query(async ({ input, ctx }) => {
             const order = await ctx.prisma.order.findFirst({
                 where: { customerId: input },
+                include: { items: { include: { item: true } } },
             });
             if (!order) {
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
 
-            return orderSchema.parse(order);
+            return order;
         }),
 });
 

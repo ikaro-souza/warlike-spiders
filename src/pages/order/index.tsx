@@ -23,6 +23,7 @@ import {
     SectionBody,
     SectionFooter,
     SectionHeader,
+    SectionTitle,
 } from "y/components/section";
 import { TopAppBar } from "y/components/top-app-bar";
 import { useRouter } from "y/lib/router";
@@ -86,7 +87,7 @@ function Page() {
             <main className="flex flex-col gap-4 pt-5">
                 <Section className="bg-white">
                     <SectionHeader className="sr-only">
-                        order items
+                        <SectionTitle>order items</SectionTitle>
                     </SectionHeader>
                     <SectionBody role="list">
                         {order.items.map((orderItem) => (
@@ -103,7 +104,9 @@ function Page() {
                     </SectionFooter>
                 </Section>
                 <Section className="bg-white">
-                    <SectionHeader className="sr-only">customer</SectionHeader>
+                    <SectionHeader className="sr-only">
+                        <SectionTitle>customer</SectionTitle>
+                    </SectionHeader>
                     <SelectedCustomer customerId={order.customerId} />
                 </Section>
             </main>
