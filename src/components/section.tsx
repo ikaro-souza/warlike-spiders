@@ -1,6 +1,17 @@
 import clsx from "clsx";
 import React from "react";
+import { type MenuSection } from "y/server/schemas";
+import { currencyFormatter } from "y/utils/locale";
+import { BottomSheet, BottomSheetHeader } from "./bottom-sheet";
 import { Button } from "./button";
+import {
+    ListItem,
+    ListItemContent,
+    ListItemHeadline,
+    ListItemImage,
+    ListItemSupportingText,
+    ListItemTrailing,
+} from "./list-item";
 
 type SectionProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -67,26 +78,80 @@ export const SectionFooter: React.FC<
 
 const maxListSectionItems = 5;
 type ListSectionProps = SectionProps & {
-    sectionTitle: React.ReactNode;
-    headerClassName?: string;
+    menuSection: MenuSection;
 };
-export const ListSection: React.FC<
-    React.PropsWithChildren<ListSectionProps>
-> = ({ children, sectionTitle, headerClassName, ...props }) => {
+export const ListSection: React.FC<ListSectionProps> = ({
+    menuSection,
+    ...props
+}) => {
+    const [open, setOpen] = React.useState(false);
+    const { sectionBodyItems, sheetItems } = React.useMemo(() => {
+        const sectionBodyItems = menuSection.items
+            .slice(0, maxListSectionItems)
+            .map((sectionItem) => {
+                const href = `/menu/item/${sectionItem.id}`;
+                return (
+                    <ListItem key={sectionItem.id} href={href}>
+                        <ListItemContent className="gap-2">
+                            <ListItemHeadline className="text-base">
+                                {currencyFormatter.format(
+                                    Number(sectionItem.unitaryPrice),
+                                )}
+                            </ListItemHeadline>
+                            <ListItemSupportingText>
+                                {sectionItem.name}
+                            </ListItemSupportingText>
+                        </ListItemContent>
+                        <ListItemTrailing>
+                            <ListItemImage
+                                className="rounded-lg"
+                                alt={sectionItem.name}
+                                url={sectionItem.image}
+                            />
+                        </ListItemTrailing>
+                    </ListItem>
+                );
+            });
+        const sheetItems = menuSection.items.map((sectionItem) => {
+            const href = `/menu/item/${sectionItem.id}`;
+            return (
+                <ListItem key={sectionItem.id} href={href} className="!px-0">
+                    <ListItemContent className="gap-2">
+                        <ListItemHeadline className="text-base">
+                            {currencyFormatter.format(
+                                Number(sectionItem.unitaryPrice),
+                            )}
+                        </ListItemHeadline>
+                        <ListItemSupportingText>
+                            {sectionItem.name}
+                        </ListItemSupportingText>
+                    </ListItemContent>
+                    <ListItemTrailing>
+                        <ListItemImage
+                            className="rounded-lg"
+                            alt={sectionItem.name}
+                            url={sectionItem.image}
+                        />
+                    </ListItemTrailing>
+                </ListItem>
+            );
+        });
+        return { sectionBodyItems, sheetItems };
+    }, [menuSection.items]);
+
     return (
         <Section {...props}>
-            <SectionHeader
-                className={clsx(
-                    "flex items-center justify-between gap-4",
-                    headerClassName,
-                )}
-            >
-                <SectionTitle>{sectionTitle}</SectionTitle>
-                <Button>Mostrar todos</Button>
+            <SectionHeader className="flex items-center justify-between gap-4 px-5">
+                <SectionTitle>{menuSection.name}</SectionTitle>
+                <Button onClick={() => setOpen(true)}>Show all</Button>
             </SectionHeader>
-            <SectionBody role="list">
-                {React.Children.toArray(children).slice(0, maxListSectionItems)}
-            </SectionBody>
+            <SectionBody role="list">{sectionBodyItems}</SectionBody>
+            <BottomSheet open={open} onClose={() => setOpen(false)}>
+                <BottomSheetHeader>
+                    <h2>{menuSection.name}</h2>
+                </BottomSheetHeader>
+                <ul className="flex-grow overflow-y-scroll">{sheetItems}</ul>
+            </BottomSheet>
         </Section>
     );
 };

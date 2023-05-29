@@ -16,6 +16,15 @@ export default {
             fontFamily: {
                 sans: ["Inter", ...defaultTheme.fontFamily.sans],
             },
+            animation: {
+                "slide-from-bottom": "slide-from-bottom 0.3s ease-out",
+            },
+            keyframes: {
+                "slide-from-bottom": {
+                    from: { marginBottom: "-10%" },
+                    to: { marginBottom: "0" },
+                },
+            },
         },
     },
     plugins: [

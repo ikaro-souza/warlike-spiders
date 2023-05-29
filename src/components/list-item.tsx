@@ -11,7 +11,7 @@ export const ListItem = React.forwardRef<
     React.PropsWithChildren<ListItemProps>
 >(({ children, className: classNameProp, href, ...props }, ref) => {
     const className = clsx(
-        "flex w-full gap-3 px-5 py-3 text-black ",
+        "flex w-full gap-3 px-5 py-3 text-black",
         classNameProp,
     );
 

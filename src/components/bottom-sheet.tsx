@@ -1,20 +1,48 @@
 import React from "react";
+import Sheet from "react-modal-sheet";
 
-type BottomSheetProps = React.HTMLAttributes<HTMLDialogElement>;
+type BottomSheetProps = Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    "onClick"
+> & {
+    open: boolean;
+    onClose: VoidFunction;
+};
 export const BottomSheet = React.forwardRef<
     HTMLDialogElement,
-    BottomSheetProps
->(({ className, ...props }, ref) => {
-    const internalRef = React.useRef<HTMLDialogElement>(null);
-    const effectiveRef = ref || internalRef;
+    React.PropsWithChildren<BottomSheetProps>
+>(({ children, open, onClose, ...props }, ref) => {
+    const backdropRef = React.useRef<HTMLDivElement>(null);
+    React.useEffect(() => {
+        const backdrop = backdropRef.current;
+        const onClick = onClose;
+        backdrop?.addEventListener("click", onClick);
+
+        return () => {
+            backdrop?.removeEventListener("click", onClick);
+        };
+    }, [onClose]);
 
     return (
-        <dialog
-            ref={effectiveRef}
-            className="backdrop:bg-black backdrop:bg-opacity-50"
+        <Sheet
+            isOpen={open}
+            onClose={onClose}
+            snapPoints={[0.5]}
+            ref={ref}
+            onClick={onClose}
+            {...props}
         >
-            BottomSheet
-        </dialog>
+            <Sheet.Container>
+                <Sheet.Content className="flex h-full flex-col gap-4 rounded-t-lg bg-white px-4 py-6">
+                    {children}
+                </Sheet.Content>
+            </Sheet.Container>
+            <Sheet.Backdrop className="!pointer-events-auto" ref={ref} />
+        </Sheet>
     );
 });
 BottomSheet.displayName = "BottomSheet";
+
+export const BottomSheetHeader: React.FC<React.PropsWithChildren> = ({
+    children,
+}) => <Sheet.Header className="text-center text-lg">{children}</Sheet.Header>;

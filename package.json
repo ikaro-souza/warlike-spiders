@@ -33,6 +33,7 @@
         "prisma-erd-generator": "^1.7.0",
         "react": "18.2.0",
         "react-dom": "18.2.0",
+        "react-modal-sheet": "^1.10.2",
         "superjson": "1.12.2",
         "tailwind-scrollbar-hide": "^1.1.7",
         "zod": "^3.21.4"

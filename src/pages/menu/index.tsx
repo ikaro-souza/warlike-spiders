@@ -14,14 +14,6 @@ import {
     HighlightedSectionItemTitle,
 } from "y/components/highlighted-section-item";
 import {
-    ListItem,
-    ListItemContent,
-    ListItemHeadline,
-    ListItemImage,
-    ListItemSupportingText,
-    ListItemTrailing,
-} from "y/components/list-item";
-import {
     ListSection,
     Section,
     SectionBody,
@@ -122,36 +114,8 @@ function Page({
                     <ListSection
                         key={section.id}
                         className="py-5"
-                        headerClassName="px-5"
-                        sectionTitle={section.name}
-                    >
-                        {section.items.map((sectionItem) => {
-                            const href = `/menu/item/${sectionItem.id}`;
-                            return (
-                                <ListItem key={sectionItem.id} href={href}>
-                                    <ListItemContent className="gap-2">
-                                        <ListItemHeadline className="text-base">
-                                            {currencyFormatter.format(
-                                                Number(
-                                                    sectionItem.unitaryPrice,
-                                                ),
-                                            )}
-                                        </ListItemHeadline>
-                                        <ListItemSupportingText>
-                                            {sectionItem.name}
-                                        </ListItemSupportingText>
-                                    </ListItemContent>
-                                    <ListItemTrailing>
-                                        <ListItemImage
-                                            className="rounded-lg"
-                                            alt={sectionItem.name}
-                                            url={sectionItem.image}
-                                        />
-                                    </ListItemTrailing>
-                                </ListItem>
-                            );
-                        })}
-                    </ListSection>
+                        menuSection={section}
+                    />
                 ))}
             </main>
         </>
