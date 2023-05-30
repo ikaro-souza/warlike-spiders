@@ -13,13 +13,20 @@ export const BottomSheet = React.forwardRef<
     React.PropsWithChildren<BottomSheetProps>
 >(({ children, open, onClose, ...props }, ref) => {
     const backdropRef = React.useRef<HTMLDivElement>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
     React.useEffect(() => {
         const backdrop = backdropRef.current;
-        const onClick = onClose;
-        backdrop?.addEventListener("click", onClick);
+        if (!backdrop) return;
+
+        const onClick = () => {
+            console.log("backdrop click");
+            onClose();
+        };
+        backdrop.addEventListener("click", onClick);
 
         return () => {
-            backdrop?.removeEventListener("click", onClick);
+            backdrop.removeEventListener("click", onClick);
         };
     }, [onClose]);
 
@@ -27,22 +34,28 @@ export const BottomSheet = React.forwardRef<
         <Sheet
             isOpen={open}
             onClose={onClose}
-            snapPoints={[0.5]}
             ref={ref}
-            onClick={onClose}
+            detent="full-height"
             {...props}
         >
-            <Sheet.Container>
-                <Sheet.Content className="flex h-full flex-col gap-4 rounded-t-lg bg-white px-4 py-6">
+            <Sheet.Container className="rounded-t-lg bg-white">
+                <Sheet.Header className="flex h-9 touch-pan-y items-center justify-center">
+                    <span className="sr-only">drag handle</span>
+                    <div className="h-1 w-8 rounded bg-gray-300" />
+                </Sheet.Header>
+                <Sheet.Content className="flex h-full flex-col gap-4 px-4 py-4">
                     {children}
                 </Sheet.Content>
             </Sheet.Container>
-            <Sheet.Backdrop className="!pointer-events-auto" ref={ref} />
+            <Sheet.Backdrop
+                className="!pointer-events-auto"
+                ref={backdropRef}
+            />
         </Sheet>
     );
 });
 BottomSheet.displayName = "BottomSheet";
 
-export const BottomSheetHeader: React.FC<React.PropsWithChildren> = ({
+export const BottomSheetTitle: React.FC<React.PropsWithChildren> = ({
     children,
-}) => <Sheet.Header className="text-center text-lg">{children}</Sheet.Header>;
+}) => <div className="text-center text-lg leading-6">{children}</div>;

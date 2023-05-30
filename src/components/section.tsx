@@ -2,7 +2,7 @@ import clsx from "clsx";
 import React from "react";
 import { type MenuSection } from "y/server/schemas";
 import { currencyFormatter } from "y/utils/locale";
-import { BottomSheet, BottomSheetHeader } from "./bottom-sheet";
+import { BottomSheet, BottomSheetTitle } from "./bottom-sheet";
 import { Button } from "./button";
 import {
     ListItem,
@@ -147,9 +147,9 @@ export const ListSection: React.FC<ListSectionProps> = ({
             </SectionHeader>
             <SectionBody role="list">{sectionBodyItems}</SectionBody>
             <BottomSheet open={open} onClose={() => setOpen(false)}>
-                <BottomSheetHeader>
+                <BottomSheetTitle>
                     <h2>{menuSection.name}</h2>
-                </BottomSheetHeader>
+                </BottomSheetTitle>
                 <ul className="flex-grow overflow-y-scroll">{sheetItems}</ul>
             </BottomSheet>
         </Section>
