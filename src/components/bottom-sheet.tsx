@@ -13,14 +13,12 @@ export const BottomSheet = React.forwardRef<
     React.PropsWithChildren<BottomSheetProps>
 >(({ children, open, onClose, ...props }, ref) => {
     const backdropRef = React.useRef<HTMLDivElement>(null);
-    const containerRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
         const backdrop = backdropRef.current;
         if (!backdrop) return;
 
         const onClick = () => {
-            console.log("backdrop click");
             onClose();
         };
         backdrop.addEventListener("click", onClick);
@@ -39,7 +37,7 @@ export const BottomSheet = React.forwardRef<
             {...props}
         >
             <Sheet.Container className="rounded-t-lg bg-white">
-                <Sheet.Header className="flex h-9 touch-pan-y items-center justify-center">
+                <Sheet.Header className="flex h-9 items-center justify-center">
                     <span className="sr-only">drag handle</span>
                     <div className="h-1 w-8 rounded bg-gray-300" />
                 </Sheet.Header>
