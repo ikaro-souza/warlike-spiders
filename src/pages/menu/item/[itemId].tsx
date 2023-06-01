@@ -6,6 +6,7 @@ import {
     type InferGetServerSidePropsType,
 } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import superjson from "superjson";
@@ -50,7 +51,7 @@ export default function Page({ itemId }: PageProps) {
 
     if (!menuItem) return <></>;
 
-    const onAddToCartClick = async () => {
+    const onAddToCartClick = () => {
         const orderItem = {
             item: menuItemCreationSchema.parse(menuItem),
             itemId: menuItem.id,
@@ -62,8 +63,6 @@ export default function Page({ itemId }: PageProps) {
         } else {
             addItemToOrder(orderItem);
         }
-
-        await router.replace("/order");
     };
 
     const onQuantityChange = (q: number): void => setQuantity(q);
@@ -142,17 +141,19 @@ export default function Page({ itemId }: PageProps) {
                     />
                 </div>
                 <BottomAppBarPrimaryAction className="flex flex-grow items-center">
-                    <Button
-                        variant="filled"
-                        className="flex-grow rounded-full py-3"
-                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                        onClick={onAddToCartClick}
-                    >
-                        Add{" "}
-                        {currencyFormatter.format(
-                            quantity * menuItem.unitaryPrice,
-                        )}
-                    </Button>
+                    <Link href="/order" className="flex-grow">
+                        <Button
+                            variant="filled"
+                            className="w-full rounded-full py-3"
+                            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                            onClick={onAddToCartClick}
+                        >
+                            Add{" "}
+                            {currencyFormatter.format(
+                                quantity * menuItem.unitaryPrice,
+                            )}
+                        </Button>
+                    </Link>
                 </BottomAppBarPrimaryAction>
             </BottomAppBar>
         </>
