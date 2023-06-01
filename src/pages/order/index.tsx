@@ -6,6 +6,7 @@ import {
     BottomAppBarActions,
     BottomAppBarPrimaryAction,
 } from "y/components/bottom-app-bar";
+import { BottomSheet, BottomSheetTitle } from "y/components/bottom-sheet";
 import { Button } from "y/components/button";
 import {
     ListItem,
@@ -35,6 +36,7 @@ import {
     useCustomers,
     useOrderCreationValue,
     useRemoveItemFromOrder,
+    useSetOrderCreationCustomer,
     useUpdateItemInOrder,
 } from "y/utils/state";
 
@@ -42,6 +44,9 @@ function Page() {
     const order = useOrderCreationValue();
     const clearOrder = useClearOrder();
     const router = useRouter();
+    const [bottomSheetIsOpen, setBottomSheetIsOpen] = React.useState(false);
+    const customers = useCustomers();
+    const setOrderCustomer = useSetOrderCreationCustomer();
     const {
         mutate: createOrder,
         isLoading,
@@ -52,7 +57,6 @@ function Page() {
             router.go(-2);
         },
     });
-
     const totalOrdered = React.useMemo(() => {
         if (!order) return 0;
         return order.items.reduce(
@@ -70,6 +74,12 @@ function Page() {
     const onClearOrderClick = () => {
         clearOrder();
         router.go(-2);
+    };
+
+    const onCustomerSelected = (customerId: string) => {
+        if (!order) return;
+        setOrderCustomer(customerId);
+        setBottomSheetIsOpen(false);
     };
 
     if (!order) {
@@ -107,7 +117,10 @@ function Page() {
                     <SectionHeader className="sr-only">
                         <SectionTitle>customer</SectionTitle>
                     </SectionHeader>
-                    <SelectedCustomer customerId={order.customerId} />
+                    <SelectedCustomer
+                        customerId={order.customerId}
+                        onClick={() => setBottomSheetIsOpen(true)}
+                    />
                 </Section>
             </main>
             <BottomAppBar>
@@ -125,6 +138,7 @@ function Page() {
                         <Button
                             variant="icon"
                             className="h-full w-full text-black"
+                            onClick={() => setBottomSheetIsOpen(true)}
                         >
                             <IconUserCircle />
                         </Button>
@@ -141,6 +155,43 @@ function Page() {
                     </Button>
                 </BottomAppBarPrimaryAction>
             </BottomAppBar>
+            <BottomSheet
+                open={bottomSheetIsOpen}
+                onClose={() => setBottomSheetIsOpen(false)}
+            >
+                <BottomSheetTitle>Customers on table</BottomSheetTitle>
+                <ul>
+                    {customers.map((customer) => (
+                        <ListItem
+                            key={customer.id}
+                            className="!px-0"
+                            onClick={() => onCustomerSelected(customer.id)}
+                        >
+                            <ListItemLeading>
+                                <ListItemImage
+                                    alt={customer.name}
+                                    url={customer.image}
+                                />
+                            </ListItemLeading>
+                            <ListItemContent>
+                                <ListItemHeadline>
+                                    {customer.name}
+                                </ListItemHeadline>
+                            </ListItemContent>
+                            <ListItemTrailing className="flex items-center">
+                                <Button
+                                    variant="text"
+                                    onClick={() =>
+                                        onCustomerSelected(customer.id)
+                                    }
+                                >
+                                    Select
+                                </Button>
+                            </ListItemTrailing>
+                        </ListItem>
+                    ))}
+                </ul>
+            </BottomSheet>
         </>
     );
 }
@@ -193,8 +244,11 @@ function OrderItem({ orderItem }: { orderItem: OrderItemCreationData }) {
     );
 }
 
-type SelectedCustomerProps = { customerId: string | undefined };
-function SelectedCustomer({ customerId }: SelectedCustomerProps) {
+type SelectedCustomerProps = {
+    customerId: string | undefined;
+    onClick: VoidFunction;
+};
+function SelectedCustomer({ customerId, onClick }: SelectedCustomerProps) {
     const customers = useCustomers();
     const customer = React.useMemo(
         () => customers.find((c) => c.id === customerId),
@@ -202,7 +256,7 @@ function SelectedCustomer({ customerId }: SelectedCustomerProps) {
     );
 
     return (
-        <ListItem role="button">
+        <ListItem role="button" onClick={onClick}>
             {customer ? (
                 <>
                     <ListItemLeading>
@@ -228,7 +282,9 @@ function SelectedCustomer({ customerId }: SelectedCustomerProps) {
                 </>
             )}
             <ListItemLeading className="flex items-center">
-                <Button>{customer ? "Change" : "Choose"}</Button>
+                <Button onClick={onClick}>
+                    {customer ? "Change" : "Choose"}
+                </Button>
             </ListItemLeading>
         </ListItem>
     );
