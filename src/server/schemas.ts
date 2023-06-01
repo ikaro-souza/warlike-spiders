@@ -83,19 +83,20 @@ export const orderItemCreationSchema = orderItemSchema
     .merge(z.object({ item: menuItemCreationSchema }));
 export type OrderItemCreationData = z.infer<typeof orderItemCreationSchema>;
 
+export const orderStatus = z.enum([
+    "created",
+    "pendingApproval",
+    "preparing",
+    "ready",
+    "served",
+    "canceled",
+]);
 export const orderSchema = z
     .object({
         completedAt: z.date().nullable(),
         customerId: z.string(),
         items: orderItemSchema.array(),
-        status: z.enum([
-            "created",
-            "pendingApproval",
-            "preparing",
-            "ready",
-            "served",
-            "canceled",
-        ]),
+        status: orderStatus,
     })
     .extend(baseSchema.shape);
 export type Order = z.infer<typeof orderSchema>;

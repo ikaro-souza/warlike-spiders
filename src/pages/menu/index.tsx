@@ -36,9 +36,10 @@ function Page({
         staleTime: 360,
         refetchOnWindowFocus: false,
     });
-    const { data: order } = api.order.getCustomerOrder.useQuery(
-        customerId || "",
-    );
+    const { data: order } = api.order.getCustomerOrder.useQuery({
+        customerId: customerId ?? "",
+        status: "created",
+    });
     const setOrderCreationData = useSetOrderCreation();
     const sections = React.useMemo(() => {
         if (!menu) return;
@@ -137,7 +138,11 @@ export async function getServerSideProps({
     });
 
     const customerId = query.customerId as string | undefined;
-    if (customerId) await ssg.order.getCustomerOrder.prefetch(customerId);
+    if (customerId)
+        await ssg.order.getCustomerOrder.prefetch({
+            customerId,
+            status: "created",
+        });
 
     await ssg.menu.getMenu.prefetch();
     return {
