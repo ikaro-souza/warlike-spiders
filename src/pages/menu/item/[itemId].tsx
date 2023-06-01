@@ -141,7 +141,7 @@ export default function Page({ itemId }: PageProps) {
                     />
                 </div>
                 <BottomAppBarPrimaryAction className="flex flex-grow items-center">
-                    <Link href="/order" className="flex-grow">
+                    <Link href="/order" replace className="flex-grow">
                         <Button
                             variant="filled"
                             className="w-full rounded-full py-3"
