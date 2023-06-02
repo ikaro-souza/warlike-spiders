@@ -7,7 +7,7 @@ import {
     BottomAppBarActions,
     BottomAppBarPrimaryAction,
 } from "y/components/bottom-app-bar";
-import { BottomSheetComposition } from "y/components/bottom-sheet";
+import { type BottomSheetComposition } from "y/components/bottom-sheet";
 import { Button } from "y/components/button";
 import {
     ListItem,
