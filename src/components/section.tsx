@@ -1,8 +1,9 @@
 import clsx from "clsx";
+import dynamic from "next/dynamic";
 import React from "react";
 import { type MenuSection } from "y/server/schemas";
 import { currencyFormatter } from "y/utils/locale";
-import { BottomSheet, BottomSheetTitle } from "./bottom-sheet";
+import { type BottomSheetComposition } from "./bottom-sheet";
 import { Button } from "./button";
 import {
     ListItem,
@@ -12,8 +13,14 @@ import {
     ListItemSupportingText,
     ListItemTrailing,
 } from "./list-item";
-
 type SectionProps = React.HTMLAttributes<HTMLDivElement>;
+const BottomSheet = dynamic(
+    () => import("./bottom-sheet").then((mod) => mod.BottomSheet),
+    {
+        ssr: false,
+        loading: () => <div>Loading...</div>,
+    },
+) as BottomSheetComposition;
 
 export const Section: React.FC<React.PropsWithChildren<SectionProps>> = ({
     children,
@@ -147,9 +154,9 @@ export const ListSection: React.FC<ListSectionProps> = ({
             </SectionHeader>
             <SectionBody role="list">{sectionBodyItems}</SectionBody>
             <BottomSheet open={open} onClose={() => setOpen(false)}>
-                <BottomSheetTitle>
+                <BottomSheet.Title>
                     <h2>{menuSection.name}</h2>
-                </BottomSheetTitle>
+                </BottomSheet.Title>
                 <ul className="flex-grow overflow-y-scroll">{sheetItems}</ul>
             </BottomSheet>
         </Section>
