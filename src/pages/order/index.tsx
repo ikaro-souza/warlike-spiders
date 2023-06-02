@@ -1,5 +1,4 @@
 import { IconCircleX, IconUserCircle } from "@tabler/icons-react";
-import dynamic from "next/dynamic";
 import React from "react";
 import {
     BottomAppBar,
@@ -7,7 +6,7 @@ import {
     BottomAppBarActions,
     BottomAppBarPrimaryAction,
 } from "y/components/bottom-app-bar";
-import { type BottomSheetComposition } from "y/components/bottom-sheet";
+import { BottomSheet } from "y/components/bottom-sheet";
 import { Button } from "y/components/button";
 import {
     ListItem,
@@ -40,10 +39,6 @@ import {
     useSetOrderCreationCustomer,
     useUpdateItemInOrder,
 } from "y/utils/state";
-const BottomSheet = dynamic(
-    () => import("y/components/bottom-sheet").then((mod) => mod.BottomSheet),
-    { ssr: false },
-) as BottomSheetComposition;
 
 function Page() {
     const order = useOrderCreationValue();

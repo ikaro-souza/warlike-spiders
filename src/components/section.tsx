@@ -1,9 +1,8 @@
 import clsx from "clsx";
-import dynamic from "next/dynamic";
 import React from "react";
 import { type MenuSection } from "y/server/schemas";
 import { currencyFormatter } from "y/utils/locale";
-import { type BottomSheetComposition } from "./bottom-sheet";
+import { BottomSheet } from "./bottom-sheet";
 import { Button } from "./button";
 import {
     ListItem,
@@ -14,10 +13,6 @@ import {
     ListItemTrailing,
 } from "./list-item";
 type SectionProps = React.HTMLAttributes<HTMLDivElement>;
-const BottomSheet = dynamic(
-    () => import("y/components/bottom-sheet").then((mod) => mod.BottomSheet),
-    { ssr: false },
-) as BottomSheetComposition;
 
 export const Section: React.FC<React.PropsWithChildren<SectionProps>> = ({
     children,
