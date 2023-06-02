@@ -8,6 +8,12 @@ type BottomSheetProps = Omit<
     open: boolean;
     onClose: VoidFunction;
 };
+export type BottomSheetComposition = React.ForwardRefExoticComponent<
+    BottomSheetProps & React.RefAttributes<HTMLDialogElement>
+> & {
+    Title: typeof BottomSheetTitle;
+};
+
 export const BottomSheet = React.forwardRef<
     HTMLDialogElement,
     React.PropsWithChildren<BottomSheetProps>
@@ -51,9 +57,10 @@ export const BottomSheet = React.forwardRef<
             />
         </Sheet>
     );
-});
+}) as BottomSheetComposition;
 BottomSheet.displayName = "BottomSheet";
 
-export const BottomSheetTitle: React.FC<React.PropsWithChildren> = ({
-    children,
-}) => <div className="text-center text-lg leading-6">{children}</div>;
+const BottomSheetTitle: React.FC<React.PropsWithChildren> = ({ children }) => (
+    <div className="text-center text-lg leading-6">{children}</div>
+);
+BottomSheet.Title = BottomSheetTitle;
