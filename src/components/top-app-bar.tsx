@@ -18,7 +18,7 @@ export const TopAppBar: React.FunctionComponent<TopAppBarProps> = ({
         <header className="flex h-10 items-center bg-white px-5">
             <button
                 className={clsx(
-                    "flex w-10 items-center justify-center",
+                    "flex h-10 w-10 items-center justify-center",
                     showPreviousButton
                         ? "pointer-events-auto visible"
                         : "pointer-events-none invisible",
