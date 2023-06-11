@@ -43,27 +43,6 @@ model Session {
     @@index([userId])
 }
 
-model User {
-    id            String                 @id @default(cuid())
-    name          String?
-    email         String?                @unique
-    emailVerified DateTime?
-    image         String?
-    role          UserRole               @default(none)
-    deletedAt     DateTime?
-    accounts      Account[]
-    sessions      Session[]
-    restaurants   Restaurant[]
-    tableSessions TableSessionCustomer[]
-}
-
-enum UserRole {
-    none
-    client
-    waiter
-    owner
-}
-
 model VerificationToken {
     identifier String
     token      String   @unique
@@ -72,18 +51,42 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-model Restaurant {
-    id        String       @id @default(cuid())
-    name      String       @db.VarChar(30)
-    createdAt DateTime     @default(now())
-    updatedAt DateTime     @updatedAt
-    ownerId   String
-    owner     User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-    menu      Menu[]
-    inventory Ingredient[]
-    recipes   Recipe[]
+model User {
+    id             String                 @id @default(cuid())
+    name           String?
+    email          String?                @unique
+    emailVerified  DateTime?
+    image          String?
+    role           UserRole               @default(none)
+    deletedAt      DateTime?
+    accounts       Account[]
+    sessions       Session[]
+    tableSessions  TableSessionCustomer[]
+    userRestaurant UserRestaurant[]
+}
 
-    @@index([ownerId])
+model UserRestaurant {
+    userId       String
+    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userRole     UserRole   @default(none)
+    restaurantId String
+    restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+    @@id([userId, restaurantId])
+    @@unique([userId, restaurantId])
+    @@index([userId])
+    @@index([restaurantId])
+}
+
+model Restaurant {
+    id             String           @id @default(cuid())
+    name           String           @db.VarChar(30)
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+    menu           Menu[]
+    inventory      Ingredient[]
+    recipes        Recipe[]
+    userRestaurant UserRestaurant[]
 }
 
 model TableSessionCustomer {
@@ -245,6 +248,13 @@ model OrderItem {
 
     @@index([itemId])
     @@index([orderId])
+}
+
+enum UserRole {
+    none
+    client
+    waiter
+    owner
 }
 
 enum MeasurementUnit {
