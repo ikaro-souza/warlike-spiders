@@ -14,7 +14,14 @@ export default {
                 background: "#f8f8f8",
             },
             fontFamily: {
-                sans: ["Inter", ...defaultTheme.fontFamily.sans],
+                sans: [
+                    "ui-sans-serif",
+                    "system-ui",
+                    "Inter",
+                    ...defaultTheme.fontFamily.sans.filter(
+                        (x) => x !== "ui-sans-serif" && x !== "system-ui",
+                    ),
+                ],
             },
             animation: {
                 "slide-from-bottom": "slide-from-bottom 0.3s ease-out",
