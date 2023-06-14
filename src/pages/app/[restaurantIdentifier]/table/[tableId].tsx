@@ -30,35 +30,12 @@ import { api } from "y/utils/api";
 import { currencyFormatter, formatTableSessionOpenTime } from "y/utils/locale";
 import { useSetCustomers, useSetOrderCreationCustomer } from "y/utils/state";
 
-export async function getServerSideProps({
-    req,
-    res,
-    query,
-}: GetServerSidePropsContext) {
-    const tableId = query.tableId as string | undefined;
-    if (typeof tableId !== "string") return { notFound: true };
+type PageProps = Omit<
+    InferGetServerSidePropsType<typeof getServerSideProps>,
+    "trpcState"
+>;
 
-    const session = await getServerAuthSession({ req, res });
-
-    const ssg = createProxySSGHelpers({
-        router: appRouter,
-        ctx: createInnerTRPCContext({ session }),
-        transformer: superjson,
-    });
-
-    await ssg.table.getTableSession.prefetch(tableId);
-
-    return {
-        props: {
-            trpcState: ssg.dehydrate(),
-            tableId,
-        },
-    };
-}
-
-function Page({
-    tableId,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function Page({ tableId, restaurantIdentifier }: PageProps) {
     const { data } = api.table.getTableSession.useQuery(tableId, {
         refetchOnWindowFocus: false,
     });
@@ -104,7 +81,7 @@ function Page({
                                     <ListItem
                                         key={x.id}
                                         className="bg-white"
-                                        href={`/menu/?customerId=${x.id}`}
+                                        href={`/app/${restaurantIdentifier}/menu/?customerId=${x.id}`}
                                         onClick={() => onCustomerClick(x.id)}
                                     >
                                         <ListItemLeading>
@@ -181,6 +158,33 @@ function Page({
 }
 
 export default Page;
+
+export async function getServerSideProps({
+    req,
+    res,
+    query,
+}: GetServerSidePropsContext) {
+    const tableId = query.tableId as string | undefined;
+    if (typeof tableId !== "string") return { notFound: true };
+
+    const session = await getServerAuthSession({ req, res });
+
+    const ssg = createProxySSGHelpers({
+        router: appRouter,
+        ctx: createInnerTRPCContext({ session }),
+        transformer: superjson,
+    });
+
+    await ssg.table.getTableSession.prefetch(tableId);
+    const restaurantIdentifier = query.restaurantIdentifier as string;
+    return {
+        props: {
+            trpcState: ssg.dehydrate(),
+            tableId,
+            restaurantIdentifier,
+        },
+    };
+}
 
 const TableStat: React.FC<{ label: string; value: string }> = ({
     label,

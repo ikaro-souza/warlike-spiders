@@ -88,9 +88,8 @@ export const ListSection: React.FC<ListSectionProps> = ({
         const sectionBodyItems = menuSection.items
             .slice(0, maxListSectionItems)
             .map((sectionItem) => {
-                const href = `/menu/item/${sectionItem.id}`;
                 return (
-                    <ListItem key={sectionItem.id} href={href}>
+                    <ListItem key={sectionItem.id} href={sectionItem.href}>
                         <ListItemContent className="gap-2">
                             <ListItemHeadline className="text-base">
                                 {currencyFormatter.format(

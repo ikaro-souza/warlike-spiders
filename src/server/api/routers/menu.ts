@@ -9,59 +9,66 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 
 export const menuRouter = createTRPCRouter({
-    getMenu: publicProcedure.query(async ({ ctx }) => {
-        const menu = await ctx.prisma.menu.findFirstOrThrow({
-            include: {
-                sections: {
-                    include: {
-                        items: {
-                            include: {
-                                ingredient: {
-                                    select: { ingredient: true },
-                                },
-                                recipe: {
-                                    select: { recipe: true },
+    getMenu: publicProcedure
+        .input(z.object({ restaurantIdentifier: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const menu = await ctx.prisma.menu.findFirstOrThrow({
+                include: {
+                    sections: {
+                        include: {
+                            items: {
+                                include: {
+                                    ingredient: {
+                                        select: { ingredient: true },
+                                    },
+                                    recipe: {
+                                        select: { recipe: true },
+                                    },
                                 },
                             },
                         },
-                    },
-                    orderBy: {
-                        highlight: "desc",
+                        orderBy: {
+                            highlight: "desc",
+                        },
                     },
                 },
-            },
-        });
+                where: {
+                    restaurant: {
+                        identifier: input.restaurantIdentifier,
+                    },
+                },
+            });
 
-        const sections: MenuSection[] = [];
+            const sections: MenuSection[] = [];
 
-        for (let index = 0; index < menu.sections.length; index++) {
-            const section = menu.sections[index];
-            if (!section) break;
+            for (let index = 0; index < menu.sections.length; index++) {
+                const section = menu.sections[index];
+                if (!section) break;
 
-            const items: MenuItem[] = [];
+                const items: MenuItem[] = [];
 
-            for (let j = 0; index < section.items.length; j++) {
-                const menuItem = section.items[j];
-                if (!menuItem) break;
+                for (let j = 0; index < section.items.length; j++) {
+                    const menuItem = section.items[j];
+                    if (!menuItem) break;
 
-                items.push(
-                    menuItemSchema.parse({
-                        ...menuItem,
-                        image:
-                            menuItem.recipe?.recipe.image ??
-                            menuItem.ingredient?.ingredient.image,
-                    }),
-                );
+                    items.push(
+                        menuItemSchema.parse({
+                            ...menuItem,
+                            image:
+                                menuItem.recipe?.recipe.image ??
+                                menuItem.ingredient?.ingredient.image,
+                        }),
+                    );
+                }
+
+                sections.push(menuSectionSchema.parse({ ...section, items }));
             }
 
-            sections.push(menuSectionSchema.parse({ ...section, items }));
-        }
-
-        return {
-            ...menu,
-            sections,
-        };
-    }),
+            return {
+                ...menu,
+                sections,
+            };
+        }),
     getMenuItem: publicProcedure
         .input(z.string().cuid())
         .output(menuItemSchema)
@@ -72,7 +79,7 @@ export const menuRouter = createTRPCRouter({
                         id: input,
                     },
                 });
-                return item;
+                return menuItemSchema.parse(item);
             } catch (error) {
                 throw new TRPCError({ code: "NOT_FOUND" });
             }

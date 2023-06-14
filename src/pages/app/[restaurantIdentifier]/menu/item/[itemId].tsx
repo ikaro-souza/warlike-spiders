@@ -28,8 +28,11 @@ import {
     useUpdateItemInOrder,
 } from "y/utils/state";
 
-type PageProps = InferGetServerSidePropsType<typeof getServerSideProps>;
-export default function Page({ itemId }: PageProps) {
+type PageProps = Omit<
+    InferGetServerSidePropsType<typeof getServerSideProps>,
+    "trpcState"
+>;
+export default function Page({ itemId, restaurantIdentifier }: PageProps) {
     const router = useRouter();
     const { data: menuItem } = api.menu.getMenuItem.useQuery(itemId);
     const [quantity, setQuantity] = React.useState(1);
@@ -141,7 +144,11 @@ export default function Page({ itemId }: PageProps) {
                     />
                 </div>
                 <BottomAppBarPrimaryAction className="flex flex-grow items-center">
-                    <Link href="/order" replace className="flex-grow">
+                    <Link
+                        href={`/app/${restaurantIdentifier}/order`}
+                        replace
+                        className="flex-grow"
+                    >
                         <Button
                             variant="filled"
                             className="w-full rounded-full py-3"
@@ -164,6 +171,7 @@ export async function getServerSideProps({
     req,
     res,
     params,
+    query,
 }: GetServerSidePropsContext) {
     const itemId = params?.itemId as string | undefined;
     if (!itemId) {
@@ -190,9 +198,11 @@ export async function getServerSideProps({
         }
     }
 
+    const restaurantIdentifier = query.restaurantIdentifier as string;
     return {
         props: {
             trpcState: ssg.dehydrate(),
+            restaurantIdentifier,
             itemId,
         },
     };

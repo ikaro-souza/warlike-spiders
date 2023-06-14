@@ -29,17 +29,22 @@ import { api } from "y/utils/api";
 import { currencyFormatter } from "y/utils/locale";
 import { useSetOrderCreation } from "y/utils/state";
 
-function Page({
-    customerId,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    const { data: menu } = api.menu.getMenu.useQuery(undefined, {
-        staleTime: 360,
-        refetchOnWindowFocus: false,
-    });
-    const { data: order } = api.order.getCustomerOrder.useQuery({
-        customerId: customerId ?? "",
-        status: "created",
-    });
+type PageProps = Omit<
+    InferGetServerSidePropsType<typeof getServerSideProps>,
+    "trpcState"
+>;
+function Page({ customerId, restaurantIdentifier }: PageProps) {
+    const { data: menu } = api.menu.getMenu.useQuery(
+        { restaurantIdentifier },
+        { staleTime: 60000 },
+    );
+    const { data: order } = api.order.getCustomerOrder.useQuery(
+        {
+            customerId: customerId ?? "",
+            status: "created",
+        },
+        { retry: false },
+    );
     const setOrderCreationData = useSetOrderCreation();
     const sections = React.useMemo(() => {
         if (!menu) return;
@@ -79,12 +84,10 @@ function Page({
                             role="list"
                         >
                             {section.items.map((sectionItem) => {
-                                const href = `/menu/item/${sectionItem.id}`;
-
                                 return (
                                     <HighlightedSectionItem
                                         className="flex-shrink-0"
-                                        href={href}
+                                        href={sectionItem.href}
                                         key={sectionItem.id}
                                     >
                                         <HighlightedSectionItemHeader
@@ -137,18 +140,29 @@ export async function getServerSideProps({
         transformer: superjson,
     });
 
-    const customerId = query.customerId as string | undefined;
-    if (customerId)
-        await ssg.order.getCustomerOrder.prefetch({
-            customerId,
-            status: "created",
+    try {
+        const customerId = (query.customerId as string | undefined) ?? null;
+        if (customerId)
+            await ssg.order.getCustomerOrder.prefetch({
+                customerId,
+                status: "created",
+            });
+
+        const restaurantIdentifier = query.restaurantIdentifier as string;
+        await ssg.menu.getMenu.prefetch({
+            restaurantIdentifier: restaurantIdentifier,
         });
 
-    await ssg.menu.getMenu.prefetch();
-    return {
-        props: {
-            trpcState: ssg.dehydrate(),
-            customerId,
-        },
-    };
+        return {
+            props: {
+                trpcState: ssg.dehydrate(),
+                customerId,
+                restaurantIdentifier,
+            },
+        };
+    } catch (error) {
+        return {
+            redirect: "/404",
+        };
+    }
 }

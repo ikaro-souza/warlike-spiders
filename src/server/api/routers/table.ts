@@ -22,37 +22,42 @@ export const tableRouter = createTRPCRouter({
         .output(waiterShiftSummarySchema)
         .query(async ({ ctx }) => {
             await ctx.prisma.restaurant.findFirst();
-
+            const href = "/app/WarklikeSpiders/table/clhcci26300008xlo8d7pmovi";
             const tables: WaiterShiftSummaryTable[] = [
                 {
                     id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 25 }).toJSDate(),
                     number: 8,
                     status: "requesting_waiter",
+                    href,
                 },
                 {
                     id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 2 }).toJSDate(),
                     number: 3,
                     status: "waiting_order",
+                    href,
                 },
                 {
                     id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 15 }).toJSDate(),
                     number: 1,
                     status: "waiting_order",
+                    href,
                 },
                 {
                     id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 40 }).toJSDate(),
                     number: 4,
                     status: "open",
+                    href,
                 },
                 {
                     id: createId(),
                     lastOrder: DateTime.now().minus({ minutes: 63 }).toJSDate(),
                     number: 9,
                     status: "open",
+                    href,
                 },
             ];
 

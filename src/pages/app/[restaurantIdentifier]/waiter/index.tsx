@@ -141,12 +141,14 @@ type TableItemProps = {
     lastOrder: Date;
     number: number;
     status: TableStatus;
+    href: string;
 };
 const TableItem: React.FC<TableItemProps> = ({
     id,
     lastOrder,
     number,
     status,
+    href,
 }) => {
     const statusText = React.useMemo(() => {
         switch (status) {
@@ -183,7 +185,7 @@ const TableItem: React.FC<TableItemProps> = ({
     return (
         <div role="listitem">
             <Link
-                href={`/table/${id}`}
+                href={href}
                 className="grid grid-cols-2 grid-rows-[auto_1fr] gap-2 rounded-xl bg-white px-2 py-3"
             >
                 <h3 className="col-span-2 row-span-1 text-center text-xs">
