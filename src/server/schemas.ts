@@ -27,6 +27,7 @@ export const waiterShiftSummaryTableSchema = z.object({
     number: z.number(),
     status: tableStatus,
     lastOrder: z.date(),
+    href: z.string(),
 });
 export type WaiterShiftSummaryTable = z.infer<
     typeof waiterShiftSummaryTableSchema
@@ -46,6 +47,7 @@ export const menuItemSchema = z
         description: z.string().max(100),
         unitaryPrice: z.number(),
         image: z.string().url(),
+        href: z.string(),
     })
     .extend(baseSchema.shape);
 export type MenuItem = z.infer<typeof menuItemSchema>;
